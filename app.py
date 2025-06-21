@@ -5,6 +5,7 @@ import logging
 from config import config
 from models.user import db, User
 from models.conversation import Conversation
+from routes.chat import chat_bp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +24,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db.init_app(app)
+
+# Register blueprints
+app.register_blueprint(chat_bp)
 
 # Create tables
 with app.app_context():
