@@ -7,7 +7,7 @@ load_dotenv()
 
 class Config:
     """Base configuration class"""
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here')
+    SECRET_KEY = os.environ.get('SECRET_KEY', None)  # Optional for basic API
     DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
     PORT = int(os.environ.get('PORT', 5001))
 
