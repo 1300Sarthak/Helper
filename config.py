@@ -9,7 +9,7 @@ class Config:
     """Base configuration class"""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key-here')
     DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
-    PORT = int(os.environ.get('PORT', 5000))
+    PORT = int(os.environ.get('PORT', 5001))
 
     # CAG Chatbot Configuration
     CAG_API_KEY = os.environ.get('CAG_API_KEY', None)
