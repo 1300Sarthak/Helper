@@ -3,6 +3,8 @@ import os
 from datetime import datetime
 import logging
 from config import config
+from models.user import db, User
+from models.conversation import Conversation
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,6 +16,17 @@ app = Flask(__name__)
 config_name = os.environ.get('FLASK_ENV', 'default')
 app_config = config[config_name]
 app.config.from_object(app_config)
+
+# Configure SQLite database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///social_change_app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+db.init_app(app)
+
+# Create tables
+with app.app_context():
+    db.create_all()
 
 
 @app.route('/')
