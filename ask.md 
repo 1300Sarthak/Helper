@@ -1,2 +1,61 @@
-## Tanzil likes dick
-#local
+Tasks 
+
+1. Initialize Flask App
+    •    Start: Create app.py with a basic Flask server
+    •    End: /ping route returns JSON { status: 'ok' }
+    •    Test: curl localhost:5000/ping returns expected JSON
+2. Create Project Structure
+    •    Start: Create folders: routes/, models/, services/, utils/
+    •    End: Files exist with init imports
+    •    Test: Project runs with flask run without errors
+3. Claude API Integration
+    •    Start: Create claude_service.py in services/
+    •    End: Function get_support_response(message, context) returns Claude reply
+    •    Test: Pass test message and get Claude response in console
+4. Define User and Message Models
+    •    Start: Create user.py and conversation.py in models/
+    •    End: SQLAlchemy models created and linked to SQLite
+    •    Test: Insert test data into tables using Flask shell
+5. Create /api/chat/message Endpoint
+    •    Start: Add chat.py in routes/ with POST /api/chat/message
+    •    End: Accepts message and user context, returns Claude response
+    •    Test: Post JSON body, get chat reply
+
+💬 Phase 2: Frontend Setup + Core UI (React + TypeScript)
+6. Bootstrap React Project
+    •    Start: Use Vite or CRA to scaffold social_change_frontend
+    •    End: Project runs with “Hello from Helper” in browser
+    •    Test: npm run dev or npm start shows root app
+7. Set Up Tailwind CSS
+    •    Start: Add Tailwind via PostCSS setup
+    •    End: Can apply utility classes (e.g., bg-gray-100)
+    •    Test: Modify <App /> to verify style works
+8. Implement Theme Toggle
+    •    Start: Add ThemeContext.tsx and ThemeToggle.tsx
+    •    End: Toggle between light/dark modes
+    •    Test: UI updates theme on toggle
+9. Implement Tab Navigation
+    •    Start: Create tab layout component (Tabs.tsx)
+    •    End: Tabs: Voice Chat | Resources | Life Coach
+    •    Test: Clicking switches views
+
+🧍 Phase 3: User Profile + Local Storage
+10. Create User Context
+    •    Start: Add UserContext.tsx with user data shape
+    •    End: Store name, location, situation, needs
+    •    Test: Access user context in any component
+11. Build UserProfileModal
+    •    Start: Form inputs: name, zip, situation, needs
+    •    End: Store in context + localStorage
+    •    Test: Refresh page, user data persists
+
+🧠 Phase 4: Claude Chat Integration (Text-Only)
+12. Build Chatbox Component
+    •    Start: Textarea input, send button, render bubbles
+    •    End: Display user + assistant messages
+    •    Test: Messages appear in order with timestamps
+13. Wire Chat to Claude Endpoint
+    •    Start: Use Axios to call POST /api/chat/message
+    •    End: Claude reply is displayed in chat
+    •    Test: Full back-and-forth flow works with dummy message
+
