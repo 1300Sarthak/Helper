@@ -894,3 +894,175 @@ def admin_dashboard_simple():
     
     except Exception as e:
         return f"Error loading admin dashboard: {str(e)}", 500
+
+
+@admin_bp.route('/api/users')
+def api_users():
+    """API endpoint for real user data"""
+    try:
+        # Get users with conversation counts
+        users_query = db.session.query(
+            User.id,
+            User.name,
+            User.location,
+            User.situation,
+            User.needs,
+            User.created_at,
+            User.updated_at,
+            db.func.count(Conversation.id).label('conversation_count')
+        ).outerjoin(Conversation).group_by(User.id).order_by(User.created_at.desc())
+        
+        users_data = []
+        for user in users_query:
+            # Get the user's most recent conversation for last active time
+            last_conversation = Conversation.query.filter_by(user_id=user.id)\
+                .order_by(Conversation.created_at.desc()).first()
+            
+            last_active = last_conversation.created_at if last_conversation else user.updated_at
+            
+            users_data.append({
+                'id': user.id,
+                'name': user.name or 'Anonymous',
+                'location': user.location or 'Unknown',
+                'situation': user.situation or 'unknown',
+                'needs': user.needs or 'General Support',
+                'created_at': user.created_at.isoformat() if user.created_at else None,
+                'last_active': last_active.isoformat() if last_active else None,
+                'conversation_count': user.conversation_count or 0
+            })
+        
+        return jsonify({
+            'users': users_data,
+            'total_count': len(users_data)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/user/<int:user_id>')
+def api_user_detail(user_id):
+    """API endpoint for detailed user data"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get user's recent conversations
+        recent_conversations = Conversation.query.filter_by(user_id=user_id)\
+            .order_by(Conversation.created_at.desc()).limit(10).all()
+        
+        recent_messages = []
+        for conv in recent_conversations:
+            if conv.message:
+                recent_messages.append({
+                    'time': conv.created_at.strftime('%H:%M') if conv.created_at else '00:00',
+                    'message': conv.message[:100] + '...' if len(conv.message) > 100 else conv.message,
+                    'full_message': conv.message
+                })
+        
+        # Get conversation count and last active
+        conversation_count = Conversation.query.filter_by(user_id=user_id).count()
+        last_conversation = Conversation.query.filter_by(user_id=user_id)\
+            .order_by(Conversation.created_at.desc()).first()
+        
+        user_detail = {
+            'id': user.id,
+            'name': user.name or 'Anonymous',
+            'location': user.location or 'Unknown',
+            'situation': user.situation or 'unknown',
+            'needs': user.needs or 'General Support',
+            'created_at': user.created_at.isoformat() if user.created_at else None,
+            'last_active': last_conversation.created_at.isoformat() if last_conversation else (user.updated_at.isoformat() if user.updated_at else None),
+            'conversation_count': conversation_count,
+            'recent_messages': recent_messages,
+            # Add placeholder fields for UI compatibility
+            'email': getattr(user, 'email', '') or '',
+            'phone': getattr(user, 'phone', '') or '',
+            'previous_services': f"Registered {user.created_at.strftime('%B %Y') if user.created_at else 'recently'}"
+        }
+        
+        return jsonify(user_detail)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/user/<int:user_id>', methods=['DELETE'])
+def api_delete_user(user_id):
+    """API endpoint to delete a user"""
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Delete all user's conversations first
+        Conversation.query.filter_by(user_id=user_id).delete()
+        
+        # Delete the user
+        db.session.delete(user)
+        db.session.commit()
+        
+        return jsonify({'success': True, 'message': 'User deleted successfully'})
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/user-needs')
+def api_user_needs():
+    """API endpoint for user needs breakdown"""
+    try:
+        # Get needs breakdown
+        needs_counts = {}
+        users = User.query.filter(User.needs.isnot(None)).all()
+        
+        for user in users:
+            if user.needs:
+                # Split needs by comma and count each
+                needs_list = [need.strip() for need in user.needs.split(',')]
+                for need in needs_list:
+                    if need:
+                        needs_counts[need] = needs_counts.get(need, 0) + 1
+        
+        # Sort by count and get top 5
+        sorted_needs = sorted(needs_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        
+        return jsonify({
+            'needs': [{'name': need, 'count': count} for need, count in sorted_needs]
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/conversation/<int:conversation_id>', methods=['DELETE'])
+def api_delete_conversation(conversation_id):
+    """API endpoint to delete a conversation"""
+    try:
+        conversation = Conversation.query.get(conversation_id)
+        if not conversation:
+            return jsonify({'error': 'Conversation not found'}), 404
+        
+        # Store conversation info for response
+        user_id = conversation.user_id
+        message_preview = (conversation.message[:50] + '...') if conversation.message and len(conversation.message) > 50 else conversation.message or 'No message'
+        
+        # Delete the conversation
+        db.session.delete(conversation)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Conversation deleted successfully',
+            'deleted_conversation': {
+                'id': conversation_id,
+                'user_id': user_id,
+                'message_preview': message_preview
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
