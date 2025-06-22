@@ -31,6 +31,7 @@ def send_message():
         context = data.get('context', {})
         user_id = data.get('user_id')
         prompt_type = data.get('prompt_type', 'empathetic_coach')
+        just_updated = context.get('justUpdated', False)
 
         logger.info(f"Received chat message: {message[:50]}...")
 
@@ -51,6 +52,20 @@ def send_message():
             db.session.commit()
             logger.info(f"Created new user: {user}")
 
+        history = []
+        if just_updated and user:
+            # Clear conversation history if profile was just updated
+            Conversation.query.filter_by(user_id=user.id).delete()
+            db.session.commit()
+            logger.info(
+                f"Cleared conversation history for user {user.id} due to profile update.")
+        elif user:
+            # Retrieve recent conversation history
+            history = Conversation.query.filter_by(user_id=user.id)\
+                .order_by(Conversation.created_at.desc())\
+                .limit(10).all()
+            history.reverse()  # Order from oldest to newest
+
         # Get emotion analysis for the message
         emotion_scores = score_emotional_state(message)
 
@@ -63,7 +78,7 @@ def send_message():
             'location': user.location,
             'situation': user.situation,
             'needs': user.needs
-        }, prompt_type, mode, data.get('is_voice', False))
+        }, prompt_type, mode, data.get('is_voice', False), history)
 
         # Save conversation with emotion analysis in context
         conversation_context = {
