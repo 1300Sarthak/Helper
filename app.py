@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, redirect
 from flask_cors import CORS
 import os
 from datetime import datetime
@@ -7,6 +7,7 @@ from config import config
 from models.user import db, User
 from models.conversation import Conversation
 from routes.chat import chat_bp
+from routes.admin import admin_bp
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,6 +32,7 @@ db.init_app(app)
 
 # Register blueprints
 app.register_blueprint(chat_bp)
+app.register_blueprint(admin_bp)
 
 # Create tables
 with app.app_context():
@@ -52,6 +54,12 @@ def home():
 def ping():
     """Ping endpoint for Task 1"""
     return jsonify({'status': 'ok'})
+
+
+@app.route('/admin')
+def admin_redirect():
+    """Redirect /admin to /admin/"""
+    return redirect('/admin/')
 
 
 @app.errorhandler(404)
