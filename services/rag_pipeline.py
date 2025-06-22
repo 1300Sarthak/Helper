@@ -140,321 +140,321 @@ class RAGPipeline:
                         "name": "Covenant House California - Oakland",
                         "address": "1695 Depot Rd, Oakland, CA",
                         "phone": "510-829-8224",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 25,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Henry Robinson Center",
                         "address": "1026 Mission Blvd, Oakland, CA",
                         "phone": "510-266-2724",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 137,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "The Holland",
                         "address": "2419 Castro St, Oakland, CA",
                         "phone": "510-785-9245",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 90,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Oakland Elizabeth House",
                         "address": "3371 Depot Rd, Oakland, CA",
                         "phone": "510-863-8125",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 26,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "East Oakland Community Project",
                         "address": "9941 University Ave, Oakland, CA",
                         "phone": "510-990-4919",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 18,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "St. Mary's Center - Closer to Home",
                         "address": "4835 Broadway, Oakland, CA",
                         "phone": "510-478-1593",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 8,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "St. Mary's Center - Presentation House",
                         "address": "8931 Ashby Ave, Oakland, CA",
                         "phone": "510-465-5451",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 8,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "St. Mary's Center - Friendly Manor",
                         "address": "362 Shattuck Ave, Oakland, CA",
                         "phone": "510-546-1983",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 8,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Salvation Army Oakland Garden Center",
                         "address": "5801 Depot Rd, Oakland, CA",
                         "phone": "510-842-5596",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 45,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Operation Dignity Veterans Housing",
                         "address": "1267 Castro St, Oakland, CA",
                         "phone": "510-516-8732",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 32,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "BOSS Oakland Emergency Shelter",
                         "address": "4715 Telegraph Ave, Oakland, CA",
                         "phone": "510-910-3574",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 28,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Matilda Cleveland Transitional Housing",
                         "address": "216 Mission Blvd, Oakland, CA",
                         "phone": "510-560-3421",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 35,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Building Futures Women's Center",
                         "address": "7354 International Blvd, Oakland, CA",
                         "phone": "510-859-4263",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 22,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Family Front Door",
                         "address": "6488 Ashby Ave, Oakland, CA",
                         "phone": "510-944-2006",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 15,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Oakland Winter Relief Center",
                         "address": "3607 Shattuck Ave, Oakland, CA",
                         "phone": "510-393-1870",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 50,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Centro Legal de la Raza Housing",
                         "address": "5956 Castro St, Oakland, CA",
                         "phone": "510-468-8245",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 12,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Davis Street Family Resource Center",
                         "address": "8236 Mission Blvd, Oakland, CA",
                         "phone": "510-951-2562",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 18,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Women's Daytime Drop-in Oakland",
                         "address": "9821 Thornton Ave, Oakland, CA",
                         "phone": "510-623-9396",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 20,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Crossroads Emergency Housing",
                         "address": "7411 University Ave, Oakland, CA",
                         "phone": "510-872-9069",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 125,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Alameda Family Services Shelter",
                         "address": "6136 Telegraph Ave, Oakland, CA",
                         "phone": "510-554-6176",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 16,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Bay Area Rescue Mission Oakland",
                         "address": "9731 Center St, Oakland, CA",
                         "phone": "510-751-8445",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 60,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Safe Haven Transitional Housing",
                         "address": "478 International Blvd, Oakland, CA",
                         "phone": "510-843-4933",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 24,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Unity Council Emergency Housing",
                         "address": "6207 University Ave, Oakland, CA",
                         "phone": "510-402-7664",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 14,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Aurora Housing Program",
                         "address": "8293 Depot Rd, Oakland, CA",
                         "phone": "510-908-9834",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 30,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Oakland Interfaith Housing",
                         "address": "170 International Blvd, Oakland, CA",
                         "phone": "510-696-7083",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 22,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Emergency Food & Shelter Oakland",
                         "address": "2788 Center St, Oakland, CA",
                         "phone": "510-612-3823",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 40,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "New Hope Housing Services",
                         "address": "6799 Telegraph Ave, Oakland, CA",
                         "phone": "510-959-8409",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 18,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Community Housing Partnership",
                         "address": "485 San Pablo Ave, Oakland, CA",
                         "phone": "510-633-1274",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 35,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Friendship Bench Emergency Shelter",
                         "address": "2088 San Pablo Ave, Oakland, CA",
                         "phone": "510-825-5347",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 25,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "PATH Oakland Emergency Housing",
                         "address": "2062 San Pablo Ave, Oakland, CA",
                         "phone": "510-816-7250",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 20,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Transitional Age Youth Program",
                         "address": "4108 International Blvd, Oakland, CA",
                         "phone": "510-386-5898",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 16,
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "OCCUR Emergency Shelter",
                         "address": "7090 Ashby Ave, Oakland, CA",
                         "phone": "510-244-8082",
-                        "hours": null,
+                        "hours": None,
                         "services": [],
-                        "requirements": null,
+                        "requirements": None,
                         "beds_available": 28,
-                        "distance": null
+                        "distance": None
                     }
                 ],
                 "healthcare": [
@@ -467,7 +467,7 @@ class RAGPipeline:
                             "Social services coordination"
                         ],
                         "requirements": "17 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Zena Abdallah",
@@ -477,7 +477,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "4 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Rachel Adams",
@@ -488,7 +488,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "5 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Neal Adams",
@@ -498,7 +498,7 @@ class RAGPipeline:
                             "Grief counseling"
                         ],
                         "requirements": "12 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Bruce Adams",
@@ -508,7 +508,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "6 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Katherine Adamson",
@@ -518,7 +518,7 @@ class RAGPipeline:
                             "LGBTQ+ affirming therapy"
                         ],
                         "requirements": "14 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Shaina Adelstein",
@@ -528,7 +528,7 @@ class RAGPipeline:
                             "ADHD therapy"
                         ],
                         "requirements": "2 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Omar Bocobo",
@@ -539,7 +539,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "22 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Catherine Ho",
@@ -549,7 +549,7 @@ class RAGPipeline:
                             "Bilingual services"
                         ],
                         "requirements": "5 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Amina Samake",
@@ -561,7 +561,7 @@ class RAGPipeline:
                             "Mental health assessment"
                         ],
                         "requirements": "14 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Emily Pellegrino",
@@ -572,7 +572,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "11 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Pamela Lozoff",
@@ -583,7 +583,7 @@ class RAGPipeline:
                             "Mental health assessment"
                         ],
                         "requirements": "6 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Elizabeth Cary",
@@ -595,7 +595,7 @@ class RAGPipeline:
                             "Group therapy"
                         ],
                         "requirements": "16 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Tara Montgomery",
@@ -607,7 +607,7 @@ class RAGPipeline:
                             "Play therapy"
                         ],
                         "requirements": "22 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Marisol Enos",
@@ -619,7 +619,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "18 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Stacy Daniels",
@@ -631,7 +631,7 @@ class RAGPipeline:
                             "Individual therapy"
                         ],
                         "requirements": "19 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Yolanda Olloway-Smith",
@@ -642,7 +642,7 @@ class RAGPipeline:
                             "ADHD therapy"
                         ],
                         "requirements": "5 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Astraea Bella",
@@ -652,7 +652,7 @@ class RAGPipeline:
                             "Individual therapy"
                         ],
                         "requirements": "4 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Brie Robertori",
@@ -662,7 +662,7 @@ class RAGPipeline:
                             "Substance abuse counseling"
                         ],
                         "requirements": "13 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Cameron Murphey",
@@ -672,7 +672,7 @@ class RAGPipeline:
                             "Group therapy"
                         ],
                         "requirements": "8 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Jennifer Martinez",
@@ -683,7 +683,7 @@ class RAGPipeline:
                             "DBT (Dialectical Behavior Therapy)"
                         ],
                         "requirements": "15 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Robert Kim",
@@ -694,7 +694,7 @@ class RAGPipeline:
                             "EMDR therapy"
                         ],
                         "requirements": "4 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Maria Rodriguez",
@@ -705,7 +705,7 @@ class RAGPipeline:
                             "Behavioral therapy"
                         ],
                         "requirements": "16 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "David Thompson",
@@ -715,7 +715,7 @@ class RAGPipeline:
                             "Multicultural counseling"
                         ],
                         "requirements": "8 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Lisa Chen",
@@ -725,7 +725,7 @@ class RAGPipeline:
                             "EMDR therapy"
                         ],
                         "requirements": "19 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "James Wilson",
@@ -735,7 +735,7 @@ class RAGPipeline:
                             "Crisis intervention"
                         ],
                         "requirements": "9 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Amy Johnson",
@@ -745,7 +745,7 @@ class RAGPipeline:
                             "Domestic violence counseling"
                         ],
                         "requirements": "16 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Carlos Morales",
@@ -757,7 +757,7 @@ class RAGPipeline:
                             "Art therapy"
                         ],
                         "requirements": "19 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Diana Lee",
@@ -768,7 +768,7 @@ class RAGPipeline:
                             "Domestic violence counseling"
                         ],
                         "requirements": "2 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Kevin Brown",
@@ -779,7 +779,7 @@ class RAGPipeline:
                             "Multicultural counseling"
                         ],
                         "requirements": "25 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Angela Davis",
@@ -789,7 +789,7 @@ class RAGPipeline:
                             "Depression and anxiety"
                         ],
                         "requirements": "17 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Michelle Garcia",
@@ -800,7 +800,7 @@ class RAGPipeline:
                             "Individual therapy"
                         ],
                         "requirements": "7 years experience",
-                        "distance": null
+                        "distance": None
                     }
                 ]
             },
@@ -815,7 +815,7 @@ class RAGPipeline:
                             "Crisis intervention"
                         ],
                         "requirements": "16 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Katrina Rose Serrano",
@@ -825,7 +825,7 @@ class RAGPipeline:
                             "Family therapy"
                         ],
                         "requirements": "11 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Judith Ann Izzo",
@@ -837,7 +837,7 @@ class RAGPipeline:
                             "DBT (Dialectical Behavior Therapy)"
                         ],
                         "requirements": "19 years experience",
-                        "distance": null
+                        "distance": None
                     },
                     {
                         "name": "Julianna Dickey",
@@ -847,7 +847,7 @@ class RAGPipeline:
                             "Trauma therapy"
                         ],
                         "requirements": "4 years experience",
-                        "distance": null
+                        "distance": None
                     }
                 ]
             }

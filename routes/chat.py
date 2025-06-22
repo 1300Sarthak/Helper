@@ -54,13 +54,16 @@ def send_message():
         # Get emotion analysis for the message
         emotion_scores = score_emotional_state(message)
 
-        # Get Gemini response with enhanced context and prompt type
+        # Get mode from request (default to coach)
+        mode = data.get('mode', 'coach')
+
+        # Get Gemini response with enhanced context, prompt type, and mode
         gemini_response = get_support_response(message, {
             'name': user.name,
             'location': user.location,
             'situation': user.situation,
             'needs': user.needs
-        }, prompt_type)
+        }, prompt_type, mode)
 
         # Save conversation with emotion analysis in context
         conversation_context = {

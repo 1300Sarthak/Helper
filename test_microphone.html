@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .test-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #007bff, #00a8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 30px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        
+        .test-circle:hover {
+            transform: scale(1.05);
+        }
+        
+        .test-circle.listening {
+            animation: pulse 2s infinite;
+        }
+        
+        .test-circle.speaking {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,123,255,0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0,123,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,123,255,0); }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(0,255,123,0.5), 0 0 30px rgba(0,255,123,0.3); }
+            to { box-shadow: 0 0 30px rgba(0,255,123,0.8), 0 0 40px rgba(0,255,123,0.5); }
+        }
+        
+        .test-icon {
+            font-size: 36px;
+            color: white;
+        }
+        
+        .status {
+            margin: 20px 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .transcript {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+            text-align: left;
+        }
+        
+        .controls {
+            margin: 20px 0;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎤 Microphone & Speech Test</h1>
+    <p>Test your microphone and speech recognition functionality</p>
+    
+    <div class="test-circle" id="testCircle" onclick="toggleRecording()">
+        <div class="test-icon">🎤</div>
+    </div>
+    
+    <div class="status" id="status">Click the microphone to start</div>
+    
+    <div class="transcript" id="transcript" style="display: none;">
+        <strong>Transcript:</strong><br>
+        <span id="transcriptText"></span>
+    </div>
+    
+    <div class="controls">
+        <button class="btn btn-secondary" onclick="stopSpeech()">Stop Speech</button>
+        <button class="btn btn-primary" onclick="testSpeech()">Test Speech Synthesis</button>
+    </div>
+    
+    <div style="margin-top: 30px; font-size: 14px; color: #666;">
+        <p><strong>Browser Support:</strong></p>
+        <p>Speech Recognition: <span id="speechRecognitionSupport"></span></p>
+        <p>Speech Synthesis: <span id="speechSynthesisSupport"></span></p>
+        <p>Microphone Permissions: <span id="micPermissions"></span></p>
+    </div>
+
+    <script>
+        let recognition = null;
+        let isListening = false;
+        
+        // Check browser support
+        window.addEventListener('load', () => {
+            // Check Speech Recognition support
+            const speechRecognitionSupported = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+            document.getElementById('speechRecognitionSupport').textContent = speechRecognitionSupported ? '✅ Supported' : '❌ Not Supported';
+            
+            // Check Speech Synthesis support
+            const speechSynthesisSupported = 'speechSynthesis' in window;
+            document.getElementById('speechSynthesisSupport').textContent = speechSynthesisSupported ? '✅ Supported' : '❌ Not Supported';
+            
+            // Check microphone permissions
+            checkMicPermissions();
+            
+            // Initialize speech recognition
+            if (speechRecognitionSupported) {
+                initSpeechRecognition();
+            }
+        });
+        
+        async function checkMicPermissions() {
+            try {
+                if (navigator.permissions) {
+                    const permission = await navigator.permissions.query({ name: 'microphone' });
+                    document.getElementById('micPermissions').textContent = `${permission.state === 'granted' ? '✅' : permission.state === 'denied' ? '❌' : '⚠️'} ${permission.state}`;
+                } else {
+                    document.getElementById('micPermissions').textContent = '⚠️ Cannot check (API not available)';
+                }
+            } catch (error) {
+                document.getElementById('micPermissions').textContent = '⚠️ Cannot check';
+            }
+        }
+        
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else {
+                return false;
+            }
+            
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                console.log('Speech recognition started');
+                document.getElementById('testCircle').classList.add('listening');
+                document.getElementById('status').textContent = 'Listening... Speak now!';
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                console.log('Speech recognized:', transcript);
+                
+                document.getElementById('transcriptText').textContent = transcript;
+                document.getElementById('transcript').style.display = 'block';
+                document.getElementById('status').textContent = 'Speech recognized! Click to try again.';
+                
+                // Speak the result back
+                speak(`I heard you say: ${transcript}`);
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                document.getElementById('testCircle').classList.remove('listening');
+                document.getElementById('status').textContent = `Error: ${event.error}. Click to try again.`;
+                isListening = false;
+            };
+            
+            recognition.onend = function() {
+                console.log('Speech recognition ended');
+                document.getElementById('testCircle').classList.remove('listening');
+                isListening = false;
+                if (document.getElementById('status').textContent.includes('Listening')) {
+                    document.getElementById('status').textContent = 'No speech detected. Click to try again.';
+                }
+            };
+            
+            return true;
+        }
+        
+        function toggleRecording() {
+            if (!recognition) {
+                alert('Speech recognition not supported in this browser. Please use Chrome, Edge, or Safari.');
+                return;
+            }
+            
+            const circle = document.getElementById('testCircle');
+            
+            // If speaking, stop speech
+            if (circle.classList.contains('speaking')) {
+                speechSynthesis.cancel();
+                circle.classList.remove('speaking');
+                document.getElementById('status').textContent = 'Speech stopped. Click to record.';
+                return;
+            }
+            
+            if (isListening) {
+                recognition.stop();
+                circle.classList.remove('listening');
+                document.getElementById('status').textContent = 'Stopped listening. Click to try again.';
+                isListening = false;
+            } else {
+                try {
+                    recognition.start();
+                    isListening = true;
+                } catch (error) {
+                    console.error('Error starting recognition:', error);
+                    document.getElementById('status').textContent = 'Error starting microphone. Check permissions.';
+                }
+            }
+        }
+        
+        function speak(text) {
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            
+            const circle = document.getElementById('testCircle');
+            
+            utterance.onstart = function() {
+                circle.classList.add('speaking');
+                document.getElementById('status').textContent = 'Speaking... Click to stop.';
+            };
+            
+            utterance.onend = function() {
+                circle.classList.remove('speaking');
+                document.getElementById('status').textContent = 'Click to record again.';
+            };
+            
+            utterance.onerror = function(event) {
+                console.error('Speech synthesis error:', event.error);
+                circle.classList.remove('speaking');
+                document.getElementById('status').textContent = 'Speech error. Click to try again.';
+            };
+            
+            speechSynthesis.speak(utterance);
+        }
+        
+        function stopSpeech() {
+            speechSynthesis.cancel();
+            document.getElementById('testCircle').classList.remove('speaking');
+            document.getElementById('status').textContent = 'Speech stopped. Click to record.';
+        }
+        
+        function testSpeech() {
+            speak('Hello! This is a test of the speech synthesis functionality. If you can hear this, speech synthesis is working correctly.');
+        }
+    </script>
+</body>
+</html> 

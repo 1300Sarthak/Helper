@@ -98,6 +98,34 @@
             color: white;
         }
         
+        .mode-toggle {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .mode-btn {
+            padding: 8px 16px;
+            background: var(--hover-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .mode-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+            opacity: 1;
+        }
+        
+        .mode-btn:hover {
+            opacity: 1;
+        }
+        
         .main-container {
             padding: 40px 20px;
             max-width: 1200px;
@@ -160,10 +188,19 @@
             animation: pulse 2s infinite;
         }
         
+        .voice-circle.speaking {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+        
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(0,123,255,0.7); }
             70% { box-shadow: 0 0 0 20px rgba(0,123,255,0); }
             100% { box-shadow: 0 0 0 0 rgba(0,123,255,0); }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(0,255,123,0.5), 0 0 30px rgba(0,255,123,0.3); }
+            to { box-shadow: 0 0 30px rgba(0,255,123,0.8), 0 0 40px rgba(0,255,123,0.5); }
         }
         
         .voice-icon {
@@ -176,6 +213,33 @@
             font-size: 18px;
             color: var(--text-color);
             text-align: center;
+        }
+        
+        .microphone-help {
+            font-size: 14px;
+            color: var(--text-color);
+            opacity: 0.6;
+            margin-top: 10px;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .permission-status {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 8px;
+            background-color: #ccc;
+        }
+        
+        .permission-status.granted {
+            background-color: #00ff7f;
+        }
+        
+        .permission-status.denied {
+            background-color: #ff4444;
         }
         
         .message-button {
@@ -283,18 +347,103 @@
             padding: 12px 16px;
             border-radius: 18px;
             max-width: 80%;
-            line-height: 1.4;
+            line-height: 1.6;
         }
         
         .message.bot {
             background: var(--hover-color);
             color: var(--text-color);
+            border: 1px solid var(--border-color);
         }
         
         .message.user {
             background: var(--accent-color);
             color: white;
             margin-left: auto;
+        }
+        
+        .message-content {
+            margin-bottom: 10px;
+        }
+        
+        .message-content p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        
+        .message-content strong {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .message-content a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .resource-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 123, 255, 0.05);
+            border-left: 3px solid var(--accent-color);
+            border-radius: 8px;
+        }
+        
+        .resource-title {
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .resource-item {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: var(--bg-color);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .resource-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .resource-details {
+            font-size: 13px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .resource-contact {
+            margin-top: 6px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .contact-link:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
         }
         
         .chat-input-container {
@@ -330,6 +479,48 @@
             border-radius: 25px;
             cursor: pointer;
             font-size: 14px;
+        }
+        
+        .send-btn:hover {
+            background: #0056b3;
+        }
+        
+        .assistant-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .call-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .call-btn:hover {
+            background: #218838;
+        }
+        
+        .email-btn {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .email-btn:hover {
+            background: #138496;
         }
         
         .overlay {
@@ -527,7 +718,14 @@
             <button class="nav-tab" onclick="switchTab('resources')">Social Resources</button>
             <button class="nav-tab" onclick="switchTab('coach')">Life Coach</button>
         </div>
-        <div></div>
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="switchMode('coach')" id="coachModeBtn">
+                🧠 Coach Mode
+            </button>
+            <button class="mode-btn" onclick="switchMode('assistant')" id="assistantModeBtn">
+                📋 Assistant Mode
+            </button>
+        </div>
     </div>
 
     <div class="main-container">
@@ -545,7 +743,10 @@
             </div>
             
             <div class="voice-status" id="voiceStatus">
-                Listening... Tap to speak
+                Tap to speak <span class="permission-status" id="micPermissionStatus"></span>
+            </div>
+            <div class="microphone-help">
+                🎤 Click the circle to start voice chat. Allow microphone access when prompted. Works best in Chrome, Edge, or Safari.
             </div>
             
             <button class="message-button" onclick="openChat()">
@@ -697,6 +898,14 @@
                 <input type="text" placeholder="Type your message..." onkeypress="handleEnter(event)">
                 <button class="send-btn" onclick="sendMessage()">Send</button>
             </div>
+            <div class="assistant-actions" id="assistantActions" style="display: none;">
+                <button class="action-btn call-btn" onclick="makeCall()">
+                    📞 Call Resource
+                </button>
+                <button class="action-btn email-btn" onclick="sendEmail()">
+                    ✉️ Send Email
+                </button>
+            </div>
         </div>
     </div>
 
@@ -705,12 +914,40 @@
         let isDarkMode = false;
         let isCoachActive = false;
         let currentTab = 'voice';
+        let currentMode = 'coach'; // 'coach' or 'assistant'
         let userInfo = {};
+        let lastResourceInfo = null; // Store last resource info for actions
         
         function toggleTheme() {
             isDarkMode = !isDarkMode;
             document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
             document.querySelector('.theme-toggle').textContent = isDarkMode ? '○ Light Mode' : '● Dark Mode';
+        }
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(mode + 'ModeBtn').classList.add('active');
+            
+            // Show/hide assistant actions based on mode
+            const assistantActions = document.getElementById('assistantActions');
+            if (mode === 'assistant') {
+                assistantActions.style.display = 'flex';
+            } else {
+                assistantActions.style.display = 'none';
+            }
+            
+            // Update chat title if chat is open
+            const chatTitle = document.querySelector('.chat-title');
+            if (chatTitle) {
+                if (mode === 'coach') {
+                    chatTitle.textContent = currentTab === 'voice' ? 'Life Coach' : 'Life Coach';
+                } else {
+                    chatTitle.textContent = currentTab === 'voice' ? 'Resource Assistant' : 'Resource Assistant';
+                }
+            }
         }
         
         function switchTab(tab) {
@@ -738,27 +975,246 @@
             }
         }
         
+        // Speech Recognition variables
+        let recognition = null;
+        let speechSynthesis = window.speechSynthesis;
+        
+        // Initialize Speech Recognition
+        function initializeSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else {
+                console.warn('Speech Recognition not supported in this browser');
+                return false;
+            }
+            
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                console.log('Speech recognition started');
+                const circle = document.querySelector('.voice-circle');
+                const status = document.getElementById('voiceStatus');
+                circle.classList.add('listening');
+                status.textContent = 'Listening... Speak now';
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                console.log('Speech recognized:', transcript);
+                
+                const status = document.getElementById('voiceStatus');
+                status.textContent = 'Processing your message...';
+                
+                // Send the transcribed text to the chat
+                processVoiceInput(transcript);
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+                const status = document.getElementById('voiceStatus');
+                const circle = document.querySelector('.voice-circle');
+                
+                circle.classList.remove('listening');
+                isListening = false;
+                
+                switch(event.error) {
+                    case 'no-speech':
+                        status.textContent = 'No speech detected. Tap to try again.';
+                        break;
+                    case 'audio-capture':
+                        status.textContent = 'Microphone not accessible. Check permissions.';
+                        break;
+                    case 'not-allowed':
+                        status.textContent = 'Microphone permission denied. Please allow access.';
+                        break;
+                    default:
+                        status.textContent = 'Speech recognition error. Tap to try again.';
+                        break;
+                }
+            };
+            
+            recognition.onend = function() {
+                console.log('Speech recognition ended');
+                const circle = document.querySelector('.voice-circle');
+                circle.classList.remove('listening');
+                isListening = false;
+            };
+            
+            return true;
+        }
+        
         function toggleVoice() {
-            isListening = !isListening;
             const circle = document.querySelector('.voice-circle');
             const status = document.getElementById('voiceStatus');
             
+            // If currently speaking, stop speech
+            if (circle.classList.contains('speaking')) {
+                stopSpeech();
+                return;
+            }
+            
+            if (!recognition && !initializeSpeechRecognition()) {
+                alert('Speech recognition is not supported in your browser. Please use a modern browser like Chrome or Edge.');
+                return;
+            }
+            
             if (isListening) {
-                circle.classList.add('listening');
-                status.textContent = 'Listening... Speak now';
-                // Simulate voice recognition
-                setTimeout(() => {
-                    status.textContent = 'Processing...';
-                    setTimeout(() => {
-                        status.textContent = 'Tap to speak again';
-                        circle.classList.remove('listening');
-                        isListening = false;
-                    }, 2000);
-                }, 3000);
-            } else {
+                // Stop listening
+                recognition.stop();
                 circle.classList.remove('listening');
                 status.textContent = 'Tap to speak';
+                isListening = false;
+            } else {
+                // Start listening
+                try {
+                    recognition.start();
+                    isListening = true;
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                    status.textContent = 'Error starting microphone. Tap to try again.';
+                }
             }
+        }
+        
+        async function processVoiceInput(transcript) {
+            const status = document.getElementById('voiceStatus');
+            
+            try {
+                // Open chat sidebar automatically
+                openChat();
+                
+                // Add user message to chat
+                addMessage(transcript, 'user');
+                
+                // Show typing indicator
+                addTypingIndicator();
+                
+                // Determine prompt type based on current mode
+                let promptType = 'empathetic_coach'; // Default
+                if (currentTab === 'resources' || currentMode === 'assistant') {
+                    promptType = 'direct_assistant';
+                }
+                
+                // Call Flask backend API
+                const response = await fetch('http://localhost:5001/api/chat/message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: transcript,
+                        context: userInfo,
+                        user_id: userInfo.user_id || null,
+                        prompt_type: promptType,
+                        mode: currentMode
+                    })
+                });
+                
+                const data = await response.json();
+                
+                // Remove typing indicator
+                removeTypingIndicator();
+                
+                if (response.ok) {
+                    // Store user_id for future requests
+                    userInfo.user_id = data.user_id;
+                    addMessage(data.response, 'bot');
+                    
+                    // Extract resource info if in assistant mode
+                    if (currentMode === 'assistant') {
+                        extractResourceInfo(data.response);
+                    }
+                    
+                    // Speak the response aloud
+                    speakResponse(data.response);
+                    
+                    status.textContent = 'Response complete. Tap to speak again.';
+                } else {
+                    const errorMsg = 'Sorry, I encountered an error. Please try again.';
+                    addMessage(errorMsg, 'bot');
+                    speakResponse(errorMsg);
+                    status.textContent = 'Error occurred. Tap to try again.';
+                }
+            } catch (error) {
+                console.error('Error processing voice input:', error);
+                removeTypingIndicator();
+                const errorMsg = 'Sorry, I could not connect to the server. Please check if the backend is running.';
+                addMessage(errorMsg, 'bot');
+                speakResponse(errorMsg);
+                status.textContent = 'Connection error. Tap to try again.';
+            }
+        }
+        
+        function speakResponse(text) {
+            // Stop any ongoing speech
+            speechSynthesis.cancel();
+            
+            // Clean text for speech (remove markdown and special characters)
+            let cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1'); // Remove bold markers
+            cleanText = cleanText.replace(/[📞📍🕒📋]/g, ''); // Remove emojis
+            cleanText = cleanText.replace(/Address:|Phone:|Hours:/g, ''); // Remove labels
+            cleanText = cleanText.replace(/\n/g, ' '); // Replace line breaks with spaces
+            
+            // Limit length for better user experience
+            if (cleanText.length > 500) {
+                cleanText = cleanText.substring(0, 500) + '... For more details, please read the chat.';
+            }
+            
+            // Create speech utterance
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+            
+            // Use a more natural voice if available
+            const voices = speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => 
+                voice.name.includes('Google') || 
+                voice.name.includes('Microsoft') ||
+                voice.lang.startsWith('en')
+            );
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+            
+            utterance.onstart = function() {
+                console.log('Speech synthesis started');
+                const circle = document.querySelector('.voice-circle');
+                const status = document.getElementById('voiceStatus');
+                circle.classList.add('speaking');
+                status.textContent = 'Speaking response... Tap to stop';
+            };
+            
+            utterance.onend = function() {
+                console.log('Speech synthesis completed');
+                const circle = document.querySelector('.voice-circle');
+                const status = document.getElementById('voiceStatus');
+                circle.classList.remove('speaking');
+                status.textContent = 'Tap to speak again';
+            };
+            
+            utterance.onerror = function(event) {
+                console.error('Speech synthesis error:', event.error);
+                const circle = document.querySelector('.voice-circle');
+                const status = document.getElementById('voiceStatus');
+                circle.classList.remove('speaking');
+                status.textContent = 'Tap to speak again';
+            };
+            
+            // Speak the response
+            speechSynthesis.speak(utterance);
+        }
+        
+        function stopSpeech() {
+            speechSynthesis.cancel();
+            const circle = document.querySelector('.voice-circle');
+            const status = document.getElementById('voiceStatus');
+            circle.classList.remove('speaking');
+            status.textContent = 'Tap to speak again';
         }
         
         function toggleCoach() {
@@ -857,12 +1313,11 @@
                 addTypingIndicator();
                 
                 try {
-                    // Determine prompt type based on current tab
+                    // Determine prompt type based on current tab and mode
                     let promptType = 'empathetic_coach'; // Default
-                    if (currentTab === 'resources') {
+                    if (currentTab === 'resources' || currentMode === 'assistant') {
                         promptType = 'direct_assistant';
                     }
-                    // Note: 'coach' tab uses empathetic_coach for warm coaching approach
                     
                     // Call Flask backend API
                     const response = await fetch('http://localhost:5001/api/chat/message', {
@@ -874,7 +1329,8 @@
                             message: message,
                             context: userInfo,
                             user_id: userInfo.user_id || null,
-                            prompt_type: promptType
+                            prompt_type: promptType,
+                            mode: currentMode
                         })
                     });
                     
@@ -887,6 +1343,11 @@
                         // Store user_id for future requests
                         userInfo.user_id = data.user_id;
                         addMessage(data.response, 'bot');
+                        
+                        // Extract resource info if in assistant mode
+                        if (currentMode === 'assistant') {
+                            extractResourceInfo(data.response);
+                        }
                     } else {
                         addMessage('Sorry, I encountered an error. Please try again.', 'bot');
                     }
@@ -902,9 +1363,166 @@
             const messagesContainer = document.querySelector('.chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
-            messageDiv.textContent = text;
+            
+            if (sender === 'bot') {
+                // Format bot messages with rich text and resource extraction
+                const formattedContent = formatBotMessage(text);
+                messageDiv.innerHTML = formattedContent;
+            } else {
+                messageDiv.textContent = text;
+            }
+            
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function formatBotMessage(text) {
+            // Split message into main content and resource information
+            const { mainContent, resources } = extractResources(text);
+            
+            let formattedText = mainContent;
+            
+            // Format bold text (**text** -> <strong>text</strong>)
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Format phone numbers as clickable links
+            formattedText = formattedText.replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1">$1</a>');
+            
+            // Format email addresses as clickable links
+            formattedText = formattedText.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1">$1</a>');
+            
+            // Split into paragraphs for better readability
+            const paragraphs = formattedText.split('\n\n').filter(p => p.trim());
+            const paragraphHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
+            
+            let html = `<div class="message-content">${paragraphHTML}</div>`;
+            
+            // Add resource section if resources were found
+            if (resources.length > 0) {
+                html += generateResourceSection(resources);
+            }
+            
+            return html;
+        }
+        
+        function extractResources(text) {
+            const resources = [];
+            let mainContent = text;
+            
+            // Pattern to match resource blocks like:
+            // **Food Resources:** * **Alameda County Community Food Bank:** *
+            // **Address:** 7900 Edgewater Dr, Oakland, CA 94621 * **Phone:** (510) 635-3663
+            const resourcePattern = /\*\*(.*?):\*\*\s*\*\s*\*\*(.*?):\*\*\s*\*\s*\*\*Address:\*\*\s*(.*?)\s*\*\s*\*\*Phone:\*\*\s*(.*?)\s*\*\s*\*\*Hours:\*\*\s*(.*?)(?:\*|$)/g;
+            
+            let match;
+            while ((match = resourcePattern.exec(text)) !== null) {
+                const [fullMatch, category, name, address, phone, hours] = match;
+                
+                resources.push({
+                    name: name.trim(),
+                    category: category.trim(),
+                    address: address.trim(),
+                    phone: phone.trim(),
+                    hours: hours.trim(),
+                    details: []
+                });
+                
+                // Remove this resource block from main content
+                mainContent = mainContent.replace(fullMatch, '');
+            }
+            
+            // Alternative pattern for simpler resource mentions
+            if (resources.length === 0) {
+                // Look for organization names followed by contact info
+                const lines = text.split('\n');
+                let currentResource = null;
+                const contentLines = [];
+                
+                for (let line of lines) {
+                    line = line.trim();
+                    
+                    // Check for organization names
+                    const orgMatch = line.match(/^([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/);
+                    if (orgMatch && !line.includes('Address:') && !line.includes('Phone:')) {
+                        if (currentResource) {
+                            resources.push(currentResource);
+                        }
+                        currentResource = {
+                            name: orgMatch[1].trim(),
+                            address: '',
+                            phone: '',
+                            hours: '',
+                            details: []
+                        };
+                        contentLines.push(line);
+                    } else if (currentResource && line.includes('Address:')) {
+                        currentResource.address = line.replace(/.*Address:\s*/, '').replace(/\s*Phone:.*/, '').trim();
+                        contentLines.push(line);
+                    } else if (currentResource && line.includes('Phone:')) {
+                        currentResource.phone = line.replace(/.*Phone:\s*/, '').replace(/\s*Hours:.*/, '').trim();
+                        contentLines.push(line);
+                    } else if (currentResource && line.includes('Hours:')) {
+                        currentResource.hours = line.replace(/.*Hours:\s*/, '').trim();
+                        contentLines.push(line);
+                    } else {
+                        contentLines.push(line);
+                    }
+                }
+                
+                if (currentResource) {
+                    resources.push(currentResource);
+                }
+                
+                // If we found resources this way, clean up the main content
+                if (resources.length > 0) {
+                    mainContent = contentLines.filter(line => {
+                        return !line.includes('Address:') && !line.includes('Phone:') && !line.includes('Hours:');
+                    }).join('\n');
+                }
+            }
+            
+            return {
+                mainContent: mainContent.replace(/\*\s*\*/g, '').trim(),
+                resources: resources
+            };
+        }
+        
+        function generateResourceSection(resources) {
+            if (resources.length === 0) return '';
+            
+            let html = '<div class="resource-section">';
+            html += '<div class="resource-title">📋 Available Resources</div>';
+            
+            resources.forEach(resource => {
+                html += '<div class="resource-item">';
+                html += `<div class="resource-name">${resource.name}</div>`;
+                
+                let details = '';
+                if (resource.address) details += `📍 ${resource.address}<br>`;
+                if (resource.hours) details += `🕒 ${resource.hours}<br>`;
+                if (resource.details.length > 0) details += resource.details.join('<br>');
+                
+                if (details) {
+                    html += `<div class="resource-details">${details}</div>`;
+                }
+                
+                if (resource.phone || resource.address) {
+                    html += '<div class="resource-contact">';
+                    if (resource.phone) {
+                        html += `<a href="tel:${resource.phone}" class="contact-link">📞 Call</a>`;
+                    }
+                    if (resource.address) {
+                        const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(resource.address)}`;
+                        html += `<a href="${mapsUrl}" target="_blank" class="contact-link">📍 Directions</a>`;
+                    }
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            return html;
         }
         
         function addTypingIndicator() {
@@ -930,8 +1548,65 @@
             }
         }
         
+        // Initialize speech synthesis voices
+        function initializeSpeechSynthesis() {
+            // Load voices
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = function() {
+                    console.log('Speech synthesis voices loaded');
+                };
+            }
+        }
+        
+        // Check microphone permissions
+        async function checkMicrophonePermissions() {
+            try {
+                if (navigator.permissions) {
+                    const permission = await navigator.permissions.query({ name: 'microphone' });
+                    updatePermissionStatus(permission.state);
+                    
+                    permission.addEventListener('change', () => {
+                        updatePermissionStatus(permission.state);
+                    });
+                } else {
+                    // Fallback for browsers without permissions API
+                    updatePermissionStatus('unknown');
+                }
+            } catch (error) {
+                console.log('Could not check microphone permissions:', error);
+                updatePermissionStatus('unknown');
+            }
+        }
+        
+        function updatePermissionStatus(state) {
+            const statusElement = document.getElementById('micPermissionStatus');
+            if (!statusElement) return;
+            
+            statusElement.className = 'permission-status';
+            
+            switch (state) {
+                case 'granted':
+                    statusElement.classList.add('granted');
+                    statusElement.title = 'Microphone access granted';
+                    break;
+                case 'denied':
+                    statusElement.classList.add('denied');
+                    statusElement.title = 'Microphone access denied - click to try again';
+                    break;
+                default:
+                    statusElement.title = 'Microphone permission status unknown';
+                    break;
+            }
+        }
+        
         // Show info popup on first load or load stored user info
         window.addEventListener('load', () => {
+            // Initialize speech synthesis
+            initializeSpeechSynthesis();
+            
+            // Check microphone permissions
+            checkMicrophonePermissions();
+            
             // Check if user has already provided info in localStorage
             const storedUserInfo = localStorage.getItem('userInfo');
             let hasUserInfo = false;
@@ -956,6 +1631,46 @@
                 }, 1000);
             }
         });
+        
+        function extractResourceInfo(response) {
+            // Extract phone numbers and organization names from response
+            const phoneRegex = /(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g;
+            const phones = response.match(phoneRegex);
+            
+            // Extract organization names
+            const orgRegex = /([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/g;
+            const orgs = response.match(orgRegex);
+            
+            // Store for action buttons
+            if (phones && phones.length > 0) {
+                lastResourceInfo = {
+                    phone: phones[0],
+                    organization: orgs && orgs.length > 0 ? orgs[0] : 'Resource',
+                    text: response
+                };
+            }
+        }
+        
+        function makeCall() {
+            if (lastResourceInfo && lastResourceInfo.phone) {
+                // For mobile devices, this will open the phone app
+                window.location.href = `tel:${lastResourceInfo.phone}`;
+            } else {
+                alert('No phone number found in the last response. Please ask for specific contact information.');
+            }
+        }
+        
+        function sendEmail() {
+            if (lastResourceInfo) {
+                const subject = encodeURIComponent('Resource Information Request');
+                const body = encodeURIComponent(`Hi,\n\nI found your contact information through the Social Change Helper app. I'm interested in learning more about your services.\n\nThe information I received was:\n${lastResourceInfo.text}\n\nCould you please provide more details about how I can access your services?\n\nThank you,\n${userInfo.name || 'A community member'}`);
+                
+                // Open default email client
+                window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            } else {
+                alert('No resource information available. Please ask for specific resources first.');
+            }
+        }
     </script>
 </body>
 </html> 

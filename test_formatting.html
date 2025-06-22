@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Formatting Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            padding: 16px;
+            border-radius: 18px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .message-content p {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        
+        .message-content strong {
+            font-weight: 600;
+            color: #007bff;
+        }
+        
+        .message-content a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .message-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .resource-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 123, 255, 0.05);
+            border-left: 3px solid #007bff;
+            border-radius: 8px;
+        }
+        
+        .resource-title {
+            font-weight: 600;
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .resource-item {
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .resource-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .resource-details {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .resource-contact {
+            margin-top: 6px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .contact-link:hover {
+            background: #0056b3;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enhanced Message Formatting Test</h1>
+    
+    <div class="message" id="testMessage">
+        <!-- This will be populated by JavaScript -->
+    </div>
+    
+    <button class="test-button" onclick="testFormatting()">Test Formatting</button>
+    <button class="test-button" onclick="testResourceExtraction()">Test Resource Extraction</button>
+    
+    <script>
+        // Copy the formatting functions from index.html
+        function formatBotMessage(text) {
+            const { mainContent, resources } = extractResources(text);
+            
+            let formattedText = mainContent;
+            
+            // Format bold text (**text** -> <strong>text</strong>)
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // Format phone numbers as clickable links
+            formattedText = formattedText.replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1">$1</a>');
+            
+            // Format email addresses as clickable links
+            formattedText = formattedText.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1">$1</a>');
+            
+            // Split into paragraphs for better readability
+            const paragraphs = formattedText.split('\n\n').filter(p => p.trim());
+            const paragraphHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
+            
+            let html = `<div class="message-content">${paragraphHTML}</div>`;
+            
+            // Add resource section if resources were found
+            if (resources.length > 0) {
+                html += generateResourceSection(resources);
+            }
+            
+            return html;
+        }
+        
+        function extractResources(text) {
+            const resources = [];
+            let mainContent = text;
+            
+            // Look for organization names followed by contact info
+            const lines = text.split('\n');
+            let currentResource = null;
+            const contentLines = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                
+                // Check for organization names
+                const orgMatch = line.match(/^([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/);
+                if (orgMatch && !line.includes('Address:') && !line.includes('Phone:')) {
+                    if (currentResource) {
+                        resources.push(currentResource);
+                    }
+                    currentResource = {
+                        name: orgMatch[1].trim(),
+                        address: '',
+                        phone: '',
+                        hours: '',
+                        details: []
+                    };
+                    contentLines.push(line);
+                } else if (currentResource && line.includes('Address:')) {
+                    currentResource.address = line.replace(/.*Address:\s*/, '').replace(/\s*Phone:.*/, '').trim();
+                } else if (currentResource && line.includes('Phone:')) {
+                    currentResource.phone = line.replace(/.*Phone:\s*/, '').replace(/\s*Hours:.*/, '').trim();
+                } else if (currentResource && line.includes('Hours:')) {
+                    currentResource.hours = line.replace(/.*Hours:\s*/, '').trim();
+                } else if (currentResource && line.includes('Requirements:')) {
+                    currentResource.details.push(line.replace(/.*Requirements:\s*/, '').trim());
+                } else if (!line.includes('Address:') && !line.includes('Phone:') && !line.includes('Hours:') && !line.includes('Requirements:')) {
+                    contentLines.push(line);
+                }
+            }
+            
+            if (currentResource) {
+                resources.push(currentResource);
+            }
+            
+            // Clean up main content
+            mainContent = contentLines.filter(line => line.trim()).join('\n');
+            
+            return {
+                mainContent: mainContent.replace(/\*\s*\*/g, '').trim(),
+                resources: resources
+            };
+        }
+        
+        function generateResourceSection(resources) {
+            if (resources.length === 0) return '';
+            
+            let html = '<div class="resource-section">';
+            html += '<div class="resource-title">📋 Available Resources</div>';
+            
+            resources.forEach(resource => {
+                html += '<div class="resource-item">';
+                html += `<div class="resource-name">${resource.name}</div>`;
+                
+                let details = '';
+                if (resource.address) details += `📍 ${resource.address}<br>`;
+                if (resource.hours) details += `🕒 ${resource.hours}<br>`;
+                if (resource.details.length > 0) details += resource.details.join('<br>');
+                
+                if (details) {
+                    html += `<div class="resource-details">${details}</div>`;
+                }
+                
+                if (resource.phone || resource.address) {
+                    html += '<div class="resource-contact">';
+                    if (resource.phone) {
+                        html += `<a href="tel:${resource.phone}" class="contact-link">📞 Call</a>`;
+                    }
+                    if (resource.address) {
+                        const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(resource.address)}`;
+                        html += `<a href="${mapsUrl}" target="_blank" class="contact-link">📍 Directions</a>`;
+                    }
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            return html;
+        }
+        
+        function testFormatting() {
+            const testMessage = `I understand you need help finding food in Oakland. Let's get you connected to some resources right away.
+
+The **Alameda County Community Food Bank** is a great place to start. They offer food assistance to anyone who needs it.
+
+You can also contact them directly at (510) 635-3663 or email them at info@accfb.org for more information.
+
+**Next Steps:**
+1. Visit during their open hours
+2. Bring identification if possible
+3. Consider visiting multiple locations for variety`;
+            
+            const formatted = formatBotMessage(testMessage);
+            document.getElementById('testMessage').innerHTML = formatted;
+        }
+        
+        function testResourceExtraction() {
+            const testMessage = `I understand you need help finding food in Oakland. Let's get you connected to some resources right away.
+
+Alameda County Community Food Bank is a great place to start. They offer food assistance to anyone who needs it.
+
+    * **Address:** 7900 Edgewater Dr, Oakland, CA 94621
+    * **Phone:** (510) 635-3663
+    * **Hours:** Monday-Friday, 9am-4pm
+    * **Requirements:** No documentation is required. Just go during their open hours.
+
+They are open now, so you could go there today. If you can't make it today, please call them to confirm their hours and availability.
+
+For additional food options, you can also try searching online for "food pantries near me Oakland, CA" to find other nearby locations.`;
+            
+            const formatted = formatBotMessage(testMessage);
+            document.getElementById('testMessage').innerHTML = formatted;
+        }
+        
+        // Test on page load
+        testFormatting();
+    </script>
+</body>
+</html> 
