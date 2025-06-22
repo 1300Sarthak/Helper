@@ -1089,248 +1089,10 @@
             return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
 
-        // Auto-refresh every 30 seconds
-        setTimeout(function() {
-            window.location.reload();
-        }, 30000);
-
-        // Conversation Monitoring System
-        const mockConversations = [];
-
-        // Conversation Management Functions
-        function initializeConversationMonitoring() {
-            renderConversationStats();
-            renderConversationsTable();
-            renderFlaggedConversations();
-            startAutoRefresh();
-        }
-
-        function renderConversationStats() {
-            const today = new Date().toDateString();
-            const todayConversations = mockConversations.filter(conv => 
-                new Date(conv.startTime).toDateString() === today
-            );
-            
-            const totalMessages = mockConversations.reduce((sum, conv) => sum + conv.messageCount, 0);
-            const avgMessages = Math.round(totalMessages / mockConversations.length);
-            
-            const supportCount = mockConversations.filter(conv => conv.mode === 'support').length;
-            const coachCount = mockConversations.filter(conv => conv.mode === 'coach').length;
-            const supportPercent = Math.round((supportCount / mockConversations.length) * 100);
-            const coachPercent = Math.round((coachCount / mockConversations.length) * 100);
-            
-            const flaggedCount = mockConversations.filter(conv => conv.isFlagged).length;
-
-            document.getElementById('todayConversations').textContent = todayConversations.length;
-            document.getElementById('avgMessages').textContent = avgMessages;
-            document.getElementById('modeBreakdown').textContent = `${supportPercent}% / ${coachPercent}%`;
-            document.getElementById('flaggedCount').textContent = flaggedCount;
-        }
-
-        function renderConversationsTable() {
-            const tbody = document.getElementById('conversationsTableBody');
-            tbody.innerHTML = '';
-
-            if (filteredConversations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No conversations found</td></tr>';
-                return;
-            }
-
-            filteredConversations.forEach(conversation => {
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-50';
-                
-                const flaggedIndicator = conversation.isFlagged ? '🚩 ' : '';
-                const lastMessagePreview = highlightSearchTerm(conversation.lastMessage, 50);
-                
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${formatTime(conversation.lastMessageTime)}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
-                        title="${conversation.userLocation} - ${conversation.userNeeds}">
-                        ${flaggedIndicator}${conversation.userAlias}
-                    </td>
-                    <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                        ${lastMessagePreview}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                               ${conversation.mode === 'support' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-                            ${conversation.mode === 'support' ? 'Support' : 'Coach'}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        ${conversation.duration}m
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${conversation.messageCount}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                               ${getLengthBadgeClass(conversation.messageCount)}">
-                            ${getLengthLabel(conversation.messageCount)}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button onclick="event.stopPropagation(); openConversationModal(${JSON.stringify(conversation).replace(/"/g, '&quot;')})" 
-                                class="text-blue-600 hover:text-blue-800 mr-3" title="View Details">
-                            👁️
-                        </button>
-                        <button onclick="event.stopPropagation(); deleteConversation(${conversation.id})" 
-                                class="text-red-600 hover:text-red-800" title="Delete Conversation">
-                            🗑️
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function renderFlaggedConversations() {
-            const flaggedConversations = mockConversations.filter(conv => conv.isFlagged);
-            const flaggedSection = document.getElementById('flaggedSection');
-            const flaggedList = document.getElementById('flaggedList');
-            
-            if (flaggedConversations.length > 0) {
-                flaggedSection.classList.remove('hidden');
-                
-                flaggedList.innerHTML = flaggedConversations.map(conversation => `
-                    <div class="bg-white border border-red-200 rounded-lg p-4 cursor-pointer hover:bg-red-50"
-                         onclick="openConversationModal(mockConversations.find(c => c.id === ${conversation.id}))">
-                        <div class="flex justify-between items-start">
-                            <div class="flex-1">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-medium text-red-800">${conversation.userAlias}</span>
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                           ${conversation.mode === 'support' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
-                                        ${conversation.mode === 'support' ? 'Support' : 'Coach'}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-gray-700 mt-1">${conversation.lastMessage}</p>
-                                <p class="text-xs text-gray-500 mt-2">${formatTime(conversation.lastMessageTime)}</p>
-                            </div>
-                            <div class="text-red-600 text-lg">🚩</div>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                flaggedSection.classList.add('hidden');
-            }
-        }
-
-        function filterConversations() {
-            const searchTerm = document.getElementById('conversationSearch').value.toLowerCase();
-            const dateFilter = document.getElementById('dateFilter').value;
-            const modeFilter = document.getElementById('modeFilter').value;
-
-            filteredConversations = mockConversations.filter(conversation => {
-                const matchesSearch = conversation.lastMessage.toLowerCase().includes(searchTerm) ||
-                                    conversation.userAlias.toLowerCase().includes(searchTerm) ||
-                                    conversation.userLocation.toLowerCase().includes(searchTerm);
-                
-                const matchesDate = filterByDate(conversation.startTime, dateFilter);
-                const matchesMode = !modeFilter || conversation.mode === modeFilter;
-                
-                return matchesSearch && matchesDate && matchesMode;
-            });
-
-            renderConversationsTable();
-            renderConversationStats();
-        }
-
-        function clearConversationFilters() {
-            document.getElementById('conversationSearch').value = '';
-            document.getElementById('dateFilter').value = '';
-            document.getElementById('modeFilter').value = '';
-            filteredConversations = [...mockConversations];
-            renderConversationsTable();
-            renderConversationStats();
-        }
-
-        function openConversationModal(conversation) {
-            currentConversation = conversation;
-            document.getElementById('conversationModalTitle').textContent = 
-                `Conversation with ${conversation.userAlias}`;
-            
-            const messagesContainer = document.getElementById('conversationMessages');
-            messagesContainer.innerHTML = conversation.messages.map(message => `
-                <div class="mb-4 ${message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}">
-                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender === 'user' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-gray-200 text-gray-800'
-                    }">
-                        <div class="text-xs opacity-75 mb-1">${message.time}</div>
-                        <div class="text-sm">${message.message}</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('modalDuration').textContent = `${conversation.duration} minutes`;
-            document.getElementById('modalMessageCount').textContent = conversation.messageCount;
-            document.getElementById('modalMode').textContent = 
-                conversation.mode === 'support' ? 'Support' : 'Coach';
-            
-            document.getElementById('conversationModal').classList.remove('hidden');
-        }
-
-        function closeConversationModal() {
-            document.getElementById('conversationModal').classList.add('hidden');
-            currentConversation = null;
-        }
-
-        function downloadTranscript() {
-            if (!currentConversation) return;
-            
-            const transcript = currentConversation.messages.map(message => 
-                `[${message.time}] ${message.sender === 'user' ? 'User' : 'Assistant'}: ${message.message}`
-            ).join('\n');
-            
-            const blob = new Blob([transcript], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `conversation_${currentConversation.userAlias.replace('#', '')}_${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }
-
-        function toggleFlaggedSection() {
-            const flaggedList = document.getElementById('flaggedList');
-            const chevron = document.getElementById('flaggedChevron');
-            
-            if (flaggedList.classList.contains('hidden')) {
-                flaggedList.classList.remove('hidden');
-                chevron.style.transform = 'rotate(180deg)';
-            } else {
-                flaggedList.classList.add('hidden');
-                chevron.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        function startAutoRefresh() {
-            if (conversationRefreshInterval) {
-                clearInterval(conversationRefreshInterval);
-            }
-            
-            conversationRefreshInterval = setInterval(async () => {
-                // Refresh conversation data from API
-                await fetchConversations();
-                renderConversationsTable();
-                renderConversationStats();
-                renderFlaggedConversations();
-            }, 10000); // 10 seconds
-        }
-
-        function stopAutoRefresh() {
-            if (conversationRefreshInterval) {
-                clearInterval(conversationRefreshInterval);
-                conversationRefreshInterval = null;
-            }
-        }
+        // Auto-refresh every 30 seconds - DISABLED to prevent page reload
+        // setTimeout(function() {
+        //     window.location.reload();
+        // }, 30000);
 
         // Helper Functions
         function formatTime(dateString) {
@@ -1380,6 +1142,42 @@
             if (messageCount <= 5) return 'bg-gray-100 text-gray-800';
             if (messageCount <= 15) return 'bg-yellow-100 text-yellow-800';
             return 'bg-orange-100 text-orange-800';
+        }
+
+        function closeConversationModal() {
+            document.getElementById('conversationModal').classList.add('hidden');
+            currentConversation = null;
+        }
+
+        function downloadTranscript() {
+            if (!currentConversation) return;
+            
+            const transcript = `Conversation with ${currentConversation.userAlias}\n` +
+                `User Message: ${currentConversation.fullMessage || currentConversation.lastMessage}\n` +
+                `Assistant Response: ${currentConversation.response || 'No response'}`;
+            
+            const blob = new Blob([transcript], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `conversation_${currentConversation.userAlias.replace('#', '')}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function toggleFlaggedSection() {
+            const flaggedList = document.getElementById('flaggedList');
+            const chevron = document.getElementById('flaggedChevron');
+            
+            if (flaggedList.classList.contains('hidden')) {
+                flaggedList.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                flaggedList.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
         }
 
         // Update tab switching to initialize conversation monitoring
@@ -1497,17 +1295,6 @@
             }
         }
 
-        async function fetchConversationDetail(conversationId) {
-            try {
-                const response = await fetch(`/admin/api/conversation/${conversationId}`);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Error fetching conversation detail:', error);
-                return null;
-            }
-        }
-
         // Override existing functions to use real data
         async function initializeConversationMonitoring() {
             const success = await fetchConversations();
@@ -1519,7 +1306,7 @@
             } else {
                 // Show error message
                 const tbody = document.getElementById('conversationsTableBody');
-                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No conversations found or error loading data</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">No conversations found or error loading data</td></tr>';
             }
         }
 
@@ -1616,7 +1403,7 @@
                 
                 flaggedList.innerHTML = flaggedConversations.map(conversation => `
                     <div class="bg-white border border-red-200 rounded-lg p-4 cursor-pointer hover:bg-red-50"
-                         onclick="openConversationModal(mockConversations.find(c => c.id === ${conversation.id}))">
+                         onclick="openConversationModal(${JSON.stringify(conversation).replace(/"/g, '&quot;')})">
                         <div class="flex justify-between items-start">
                             <div class="flex-1">
                                 <div class="flex items-center space-x-2">
@@ -1676,33 +1463,42 @@
             const messagesContainer = document.getElementById('conversationMessages');
             messagesContainer.innerHTML = '<div class="text-center py-8"><div class="text-gray-500">Loading conversation...</div></div>';
             
-            // Fetch detailed conversation data
-            const detailedConversation = await fetchConversationDetail(conversation.id);
+            // For the current conversation model, we'll display the user message and AI response
+            const messages = [];
             
-            if (detailedConversation && detailedConversation.messages) {
-                messagesContainer.innerHTML = detailedConversation.messages.map(message => `
-                    <div class="mb-4 ${message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}">
-                        <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                            message.sender === 'user' 
-                                ? 'bg-blue-500 text-white' 
-                                : 'bg-gray-200 text-gray-800'
-                        }">
-                            <div class="text-xs opacity-75 mb-1">${message.time}</div>
-                            <div class="text-sm">${message.message}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                document.getElementById('modalDuration').textContent = `${detailedConversation.duration} minutes`;
-                document.getElementById('modalMessageCount').textContent = detailedConversation.messageCount;
-                document.getElementById('modalMode').textContent = 
-                    detailedConversation.mode === 'support' ? 'Support' : 'Coach';
-                
-                // Update current conversation with detailed data
-                currentConversation = detailedConversation;
-            } else {
-                messagesContainer.innerHTML = '<div class="text-center py-8"><div class="text-red-500">Error loading conversation details</div></div>';
+            if (conversation.fullMessage || conversation.lastMessage) {
+                messages.push({
+                    time: formatTime(conversation.startTime),
+                    sender: 'user',
+                    message: conversation.fullMessage || conversation.lastMessage
+                });
             }
+            
+            if (conversation.response) {
+                messages.push({
+                    time: formatTime(conversation.lastMessageTime),
+                    sender: 'assistant',
+                    message: conversation.response
+                });
+            }
+            
+            messagesContainer.innerHTML = messages.map(message => `
+                <div class="mb-4 ${message.sender === 'user' ? 'flex justify-end' : 'flex justify-start'}">
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                        message.sender === 'user' 
+                            ? 'bg-blue-500 text-white' 
+                            : 'bg-gray-200 text-gray-800'
+                    }">
+                        <div class="text-xs opacity-75 mb-1">${message.time}</div>
+                        <div class="text-sm">${message.message}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('modalDuration').textContent = `${conversation.duration} minutes`;
+            document.getElementById('modalMessageCount').textContent = conversation.messageCount;
+            document.getElementById('modalMode').textContent = 
+                conversation.mode === 'support' ? 'Support' : 'Coach';
             
             document.getElementById('conversationModal').classList.remove('hidden');
         }
