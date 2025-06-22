@@ -1,4 +1,4 @@
-# Claude 4 calls, prompt templates
+# Claude 4 calls, prompt templates - Enhanced with CAG System Prompts
 
 import os
 import logging
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class ClaudeService:
-    """Service for interacting with Claude API"""
+    """Service for interacting with Claude API with CAG System Prompts"""
 
     def __init__(self):
         self.api_key = os.environ.get('CLAUDE_API_KEY')
@@ -26,20 +26,106 @@ class ClaudeService:
         if not self.api_key:
             logger.warning("CLAUDE_API_KEY not set in environment variables")
 
-    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None) -> str:
+    def _get_cag_system_prompts(self) -> Dict[str, str]:
+        """Define the two CAG system prompts"""
+        return {
+            "empathetic_coach": """
+You are an AI social worker and life coach assistant. Your goal is to help people—especially those experiencing hardship—navigate resources for housing, food, healthcare, mental health, legal help, and social support.
+
+Key rules:
+
+1. **Hyper-Personalized Support**:
+    - Based on user input (e.g., "I'm from Fremont" or "I need help with housing"), tailor everything locally. 
+    - Mention real nearby resources (e.g., Fremont Family Resource Center, Tri-City Volunteers Food Bank) only if they were part of user-provided input.
+    - Never hallucinate or invent resources not explicitly mentioned or verified through the user's prompt.
+
+2. **Empathetic Coaching Tone**:
+    - Be warm, calm, and encouraging.
+    - Speak as if you're a trusted community advocate, counselor, or coach.
+    - Example: "I understand that housing insecurity can feel overwhelming, especially in places like Fremont where resources can be limited. Here's what you can do…"
+
+3. **Personal Progress Framing**:
+    - Frame suggestions around achievable steps.
+    - Example: "Let's work on getting you shelter for the night, and then we can explore food access."
+
+4. **No Links**:
+    - Do NOT generate clickable hyperlinks. If a user gives a site, only mention it as plain text.
+    - Do not make up any organization names unless they are included by the user.
+
+5. **Stick to the Context Provided**:
+    - If the user doesn't provide their location or situation, ask once.
+    - Avoid vague or general responses—get specific based on user's details.
+
+6. **Be Trauma-Informed**:
+    - Always assume the user might be in a vulnerable state. Avoid blame, judgment, or cold replies.
+
+7. **Avoid Generic Advice Unless Asked**:
+    - Do not give general life coaching unless directly prompted.
+    - Prioritize access to **tangible support** first (shelters, food, clinics, helplines).
+
+8. **Never make up facts or organizations. Be honest if unsure.**
+
+9. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond naturally and briefly, then ask how you can help.""",
+
+            "direct_assistant": """
+You are a direct and efficient AI assistant built to provide **step-by-step, no-nonsense guides** to help people in need access essential services like housing, food, healthcare, mental support, and legal aid.
+
+Key rules:
+
+1. **Clear Steps, One Goal per Answer**:
+    - Break down help into 1–2–3 format (e.g., "Here's how to find a shelter tonight…")
+    - Keep answers focused and short.
+    - Avoid flowery language—focus on function.
+
+2. **Location-Specific Only if Given**:
+    - ONLY mention city-specific options (like Fremont shelters) if the user tells you their location.
+    - If they haven't, ask once: "What city or zip code are you in?"
+
+3. **No Personalization or Emotions**:
+    - Do not act like a coach or emotional support.
+    - Speak like a checklist: "To apply for CalFresh, do this…"
+
+4. **No Links or Unverifiable Info**:
+    - Do not provide hyperlinks or fake organization names.
+    - Mention sites only if the user gives one or asks for it by name.
+
+5. **Always Tell the Truth**:
+    - If you don't know the resource, say: "I don't have that information. Please check with a verified local provider."
+
+6. **Never Assume or Guess**:
+    - Only use what the user has told you. No assumptions, no hallucinations.
+
+7. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond briefly and directly ask what they need help with."""
+        }
+
+    def _is_simple_greeting(self, message: str) -> bool:
+        """Check if message is a simple greeting"""
+        greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'sup', 'what\'s up']
+        message_clean = message.lower().strip()
+        return any(greeting in message_clean for greeting in greetings) and len(message_clean.split()) <= 3
+
+    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
         """
-        Generate a supportive response using Claude API with RAG enhancement
+        Generate a supportive response using Claude API with CAG enhancement
 
         Args:
             message: User's input message
             context: Optional context information (user situation, location, etc.)
+            prompt_type: Either "empathetic_coach" or "direct_assistant"
 
         Returns:
             Claude's response as a string
         """
         try:
             if not self.api_key:
-                return self._fallback_response(message)
+                return self._fallback_response(message, prompt_type)
+
+            # Handle simple greetings naturally
+            if self._is_simple_greeting(message):
+                if prompt_type == "direct_assistant":
+                    return "Hello. What do you need help with?"
+                else:
+                    return "Hi there! I'm here to help you navigate resources and support. What can I assist you with today?"
 
             # Get local resources via RAG pipeline
             rag_context = ""
@@ -50,14 +136,11 @@ class ClaudeService:
                     needs,
                     context.get('situation')
                 )
-                rag_context = rag_pipeline.format_resources_for_claude(
-                    rag_results)
-                logger.info(
-                    f"RAG retrieved {rag_results.get('total_resources', 0)} resources")
+                rag_context = rag_pipeline.format_resources_for_claude(rag_results)
+                logger.info(f"RAG retrieved {rag_results.get('total_resources', 0)} resources")
 
-            # Build the enhanced system prompt
-            system_prompt = self._build_enhanced_system_prompt(
-                context, rag_context)
+            # Build the enhanced system prompt with CAG type
+            system_prompt = self._build_enhanced_system_prompt(context, rag_context, prompt_type)
 
             # Prepare the API request
             headers = {
@@ -68,7 +151,7 @@ class ClaudeService:
 
             payload = {
                 "model": self.model,
-                "max_tokens": 1200,  # Increased for more detailed responses
+                "max_tokens": 1200,
                 "system": system_prompt,
                 "messages": [
                     {
@@ -78,8 +161,7 @@ class ClaudeService:
                 ]
             }
 
-            logger.info(
-                f"Sending request to Claude API for message: {message[:50]}...")
+            logger.info(f"Sending request to Claude API with prompt type: {prompt_type}")
 
             response = requests.post(
                 self.api_url,
@@ -94,28 +176,93 @@ class ClaudeService:
                 logger.info("Successfully received response from Claude API")
                 return claude_response
             else:
-                logger.error(
-                    f"Claude API error: {response.status_code} - {response.text}")
-                return self._fallback_response(message)
+                logger.error(f"Claude API error: {response.status_code} - {response.text}")
+                return self._fallback_response(message, prompt_type)
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Network error calling Claude API: {str(e)}")
-            return self._fallback_response(message)
+            return self._fallback_response(message, prompt_type)
         except Exception as e:
             logger.error(f"Unexpected error in Claude service: {str(e)}")
-            return self._fallback_response(message)
+            return self._fallback_response(message, prompt_type)
 
+    def _build_enhanced_system_prompt(self, context: Optional[Dict[str, Any]] = None, rag_context: str = "", prompt_type: str = "empathetic_coach") -> str:
+        """Build enhanced system prompt with RAG context and CAG prompt type"""
+        prompts = self._get_cag_system_prompts()
+        base_prompt = prompts.get(prompt_type, prompts["empathetic_coach"])
+
+        # Add user context
+        if context:
+            context_info = ""
+            if context.get('location'):
+                context_info += f"\nUser location: {context['location']}"
+            if context.get('situation'):
+                context_info += f"\nUser situation: {context['situation']}"
+            if context.get('needs'):
+                context_info += f"\nUser needs: {context['needs']}"
+
+            if context_info:
+                base_prompt += f"\n\nUser Context:{context_info}"
+
+        # Add RAG context with local resources
+        if rag_context:
+            base_prompt += f"\n\nLocal Resources Available:\n{rag_context}"
+            base_prompt += "\nUse these specific local resources in your response. Provide exact addresses, phone numbers, and hours when available."
+
+        return base_prompt
+
+    def _fallback_response(self, message: str, prompt_type: str = "empathetic_coach") -> str:
+        """Fallback response when Claude API is unavailable"""
+        if self._is_simple_greeting(message):
+            if prompt_type == "direct_assistant":
+                return "Hello. What do you need help with? (Note: I'm currently offline but will try to assist.)"
+            else:
+                return "Hi there! I'm here to help you, though I'm having some technical difficulties right now. How can I assist you?"
+        
+        fallback_responses = {
+            "empathetic_coach": f"I understand you're reaching out for support, and I want you to know that your message is important. While I'm having trouble connecting right now, I can see you mentioned: '{message}'. Please know that help is available, and you're taking a positive step by seeking support. Is there something specific I can try to help you with?",
+            
+            "direct_assistant": f"I'm currently offline but received your request: '{message}'. Try these steps: 1) Call 2-1-1 for local resources, 2) Visit your nearest community center, 3) Check with local social services. What specific help do you need?"
+        }
+        
+        return fallback_responses.get(prompt_type, fallback_responses["empathetic_coach"])
+
+    def _extract_needs_from_message(self, message: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
+        """Extract needs from user message and context"""
+        needs = []
+        message_lower = message.lower()
+
+        # Extract from message
+        if any(word in message_lower for word in ["food", "hungry", "eat", "meal"]):
+            needs.append("food")
+        if any(word in message_lower for word in ["shelter", "housing", "sleep", "bed", "place to stay"]):
+            needs.append("shelter")
+        if any(word in message_lower for word in ["health", "medical", "doctor", "clinic", "sick"]):
+            needs.append("healthcare")
+        if any(word in message_lower for word in ["job", "work", "employment", "career"]):
+            needs.append("employment")
+
+        # Extract from context
+        if context and context.get('needs'):
+            context_needs = context['needs'].lower()
+            if any(word in context_needs for word in ["food", "hungry", "eat"]):
+                needs.append("food")
+            if any(word in context_needs for word in ["shelter", "housing", "sleep"]):
+                needs.append("shelter")
+            if any(word in context_needs for word in ["health", "medical"]):
+                needs.append("healthcare")
+            if any(word in context_needs for word in ["job", "work", "employment"]):
+                needs.append("employment")
+
+        # Default to food if no specific needs detected
+        if not needs:
+            needs = ["food"]
+
+        return list(set(needs))  # Remove duplicates
+
+    # Keep all the existing methods for journal analysis, conversation summary, etc.
     def analyze_journal_entry(self, journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Analyze a journal entry for emotion scoring and insights using Claude
-
-        Args:
-            journal_text: The journal entry text
-            user_context: Optional user context for personalized analysis
-
-        Returns:
-            Dictionary with emotion scores, insights, and suggestions
-        """
+        """Analyze a journal entry for emotion scoring and insights using Claude"""
         try:
             if not self.api_key:
                 return self._fallback_analysis(journal_text)
@@ -153,22 +300,12 @@ Please analyze and respond with ONLY a valid JSON object containing:
             return self._fallback_analysis(journal_text)
 
     def summarize_conversation(self, messages: List[Dict[str, str]], user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Summarize a conversation for context and insights using Claude
-
-        Args:
-            messages: List of message dictionaries with 'role' and 'content'
-            user_context: Optional user context
-
-        Returns:
-            Dictionary with summary, key themes, and recommendations
-        """
+        """Summarize a conversation for context and insights using Claude"""
         try:
             if not self.api_key:
                 return self._fallback_summary(messages)
 
-            conversation = "\n".join(
-                [f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in messages[-10:]])  # Last 10 messages
+            conversation = "\n".join([f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in messages[-10:]])
 
             prompt = f"""Summarize this conversation and provide insights in JSON format:
 
@@ -199,15 +336,7 @@ Please analyze and respond with ONLY a valid JSON object containing:
             return self._fallback_summary(messages)
 
     def score_emotional_state(self, text: str) -> Dict[str, float]:
-        """
-        Score emotional state from text using Claude
-
-        Args:
-            text: Text to analyze
-
-        Returns:
-            Dictionary with emotion scores (0-1 scale)
-        """
+        """Score emotional state from text using Claude"""
         try:
             if not self.api_key:
                 return self._fallback_emotion_scores()
@@ -228,7 +357,10 @@ Respond with:
 
             response = self._call_claude_api(prompt, max_tokens=400)
             if response:
-                return self._parse_json_response(response, self._fallback_emotion_scores())
+                parsed = self._parse_json_response(response, self._fallback_emotion_scores())
+                parsed['timestamp'] = datetime.now().isoformat()
+                parsed['source'] = 'claude'
+                return parsed
             else:
                 return self._fallback_emotion_scores()
 
@@ -237,7 +369,7 @@ Respond with:
             return self._fallback_emotion_scores()
 
     def _call_claude_api(self, prompt: str, max_tokens: int = 1200) -> Optional[str]:
-        """Make API call to Claude for analysis tasks"""
+        """Call Claude API with the given prompt"""
         try:
             headers = {
                 "Content-Type": "application/json",
@@ -267,8 +399,7 @@ Respond with:
                 response_data = response.json()
                 return response_data['content'][0]['text']
             else:
-                logger.error(
-                    f"Claude API error: {response.status_code} - {response.text}")
+                logger.error(f"Claude API error: {response.status_code} - {response.text}")
                 return None
 
         except Exception as e:
@@ -278,7 +409,6 @@ Respond with:
     def _parse_json_response(self, response: str, fallback: Dict[str, Any]) -> Dict[str, Any]:
         """Parse JSON response from Claude"""
         try:
-            # Clean up response
             response_clean = response.strip()
             if response_clean.startswith('```json'):
                 response_clean = response_clean[7:-3]
@@ -286,104 +416,22 @@ Respond with:
                 response_clean = response_clean[3:-3]
 
             parsed = json.loads(response_clean)
-
-            # Add metadata
             parsed['timestamp'] = datetime.now().isoformat()
             parsed['source'] = 'claude'
-
             return parsed
 
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse Claude JSON response: {str(e)}")
             return fallback
 
-    def _extract_needs_from_message(self, message: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
-        """Extract needs from user message and context"""
-        needs = []
-        message_lower = message.lower()
-
-        # Extract from message
-        if any(word in message_lower for word in ["food", "hungry", "eat", "meal"]):
-            needs.append("food")
-        if any(word in message_lower for word in ["shelter", "housing", "sleep", "bed", "place to stay"]):
-            needs.append("shelter")
-        if any(word in message_lower for word in ["health", "medical", "doctor", "clinic", "sick"]):
-            needs.append("healthcare")
-        if any(word in message_lower for word in ["job", "work", "employment", "career"]):
-            needs.append("employment")
-
-        # Extract from context
-        if context and context.get('needs'):
-            context_needs = context['needs'].lower()
-            if any(word in context_needs for word in ["food", "hungry", "eat"]):
-                needs.append("food")
-            if any(word in context_needs for word in ["shelter", "housing", "sleep"]):
-                needs.append("shelter")
-            if any(word in context_needs for word in ["health", "medical"]):
-                needs.append("healthcare")
-            if any(word in context_needs for word in ["job", "work", "employment"]):
-                needs.append("employment")
-
-        # Default to food if no specific needs detected
-        if not needs:
-            needs = ["food"]
-
-        return list(set(needs))  # Remove duplicates
-
-    def _build_enhanced_system_prompt(self, context: Optional[Dict[str, Any]] = None, rag_context: str = "") -> str:
-        """Build enhanced system prompt with RAG context"""
-        base_prompt = """You are a compassionate AI assistant for a social change app that helps people in difficult situations. Your role is to:
-
-1. Provide warm, empathetic support using motivational interviewing techniques
-2. Help users find local resources (food banks, shelters, clinics, job assistance)
-3. Offer practical guidance and emotional support
-4. Maintain hope and dignity in all interactions
-5. Be non-judgmental and respectful
-
-Always respond with empathy and practical help. Use specific local resource information when available."""
-
-        # Add user context
-        if context:
-            context_info = ""
-            if context.get('location'):
-                context_info += f"\nUser location: {context['location']}"
-            if context.get('situation'):
-                context_info += f"\nUser situation: {context['situation']}"
-            if context.get('needs'):
-                context_info += f"\nUser needs: {context['needs']}"
-
-            if context_info:
-                base_prompt += f"\n\nUser Context:{context_info}"
-
-        # Add RAG context with local resources
-        if rag_context:
-            base_prompt += f"\n\nLocal Resources Available:\n{rag_context}"
-            base_prompt += "\nUse these specific local resources in your response. Provide exact addresses, phone numbers, and hours when available."
-
-        return base_prompt
-
-    def _build_system_prompt(self, context: Optional[Dict[str, Any]] = None) -> str:
-        """Build the system prompt for Claude based on context (legacy method)"""
-        return self._build_enhanced_system_prompt(context, "")
-
-    def _fallback_response(self, message: str) -> str:
-        """Fallback response when Claude API is unavailable"""
-        return f"I understand you're reaching out for support. While I'm having trouble connecting to my full capabilities right now, I want you to know that your message is important. You mentioned: '{message}'. Please know that help is available, and you're taking a positive step by seeking support. Is there something specific I can try to help you with right now?"
-
     def _fallback_analysis(self, journal_text: str) -> Dict[str, Any]:
         """Fallback analysis when Claude is unavailable"""
-        # Simple keyword-based analysis
         text_lower = journal_text.lower()
+        distress_words = ['sad', 'depressed', 'anxious', 'worried', 'scared', 'hopeless', 'difficult', 'hard', 'struggle']
+        hope_words = ['better', 'hope', 'improve', 'positive', 'good', 'happy', 'grateful', 'thankful']
 
-        distress_words = ['sad', 'depressed', 'anxious', 'worried',
-                          'scared', 'hopeless', 'difficult', 'hard', 'struggle']
-        hope_words = ['better', 'hope', 'improve', 'positive',
-                      'good', 'happy', 'grateful', 'thankful']
-
-        distress_score = min(sum(
-            1 for word in distress_words if word in text_lower) / len(distress_words), 1.0)
-        hope_score = min(
-            sum(1 for word in hope_words if word in text_lower) / len(hope_words), 1.0)
+        distress_score = min(sum(1 for word in distress_words if word in text_lower) / len(distress_words), 1.0)
+        hope_score = min(sum(1 for word in hope_words if word in text_lower) / len(hope_words), 1.0)
 
         return {
             "emotion_scores": {
@@ -431,12 +479,11 @@ Always respond with empathy and practical help. Use specific local resource info
 claude_service = ClaudeService()
 
 
-def get_support_response(message: str, context: Optional[Dict[str, Any]] = None) -> str:
+def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
     """
-    Main function to get support response from Claude
-    This is the function required by Task 3
+    Main function to get support response from Claude with CAG prompt type
     """
-    return claude_service.get_support_response(message, context)
+    return claude_service.get_support_response(message, context, prompt_type)
 
 
 def analyze_journal_entry(journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import os
 from datetime import datetime
 import logging
@@ -12,6 +13,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Enable CORS for frontend connection
+CORS(app, origins=["http://localhost:8000", "http://127.0.0.1:8000"])
 
 # Load configuration
 config_name = os.environ.get('FLASK_ENV', 'default')

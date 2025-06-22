@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Social Change - Clean Voice Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --accent-color: #007bff;
+            --hover-color: #f8f9fa;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #333333;
+            --accent-color: #0084ff;
+            --hover-color: #2a2a2a;
+            --shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .top-bar {
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .theme-toggle {
+            background: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .nav-tab.active {
+            background: var(--accent-color);
+            color: white;
+            opacity: 1;
+        }
+        
+        .nav-tab:hover {
+            background: var(--hover-color);
+            opacity: 1;
+        }
+        
+        .nav-tab.active:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .main-container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 60px;
+            color: var(--text-color);
+        }
+        
+        .chat-interface {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+        
+        .voice-circle-container {
+            position: relative;
+            margin-bottom: 40px;
+        }
+        
+        .logo-text {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-color);
+            white-space: nowrap;
+        }
+        
+        .voice-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), #00a8ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .voice-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+        }
+        
+        .voice-circle.listening {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,123,255,0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0,123,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,123,255,0); }
+        }
+        
+        .voice-icon {
+            font-size: 48px;
+            color: white;
+        }
+        
+        .voice-status {
+            margin-top: 20px;
+            font-size: 18px;
+            color: var(--text-color);
+            text-align: center;
+        }
+        
+        .message-button {
+            background: none;
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .message-button:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .quick-action {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 15px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            border-color: var(--accent-color);
+        }
+        
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .quick-action-text {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        .chat-sidebar {
+            position: fixed;
+            left: -400px;
+            top: 60px;
+            width: 400px;
+            height: calc(100vh - 60px);
+            background: var(--bg-color);
+            border-right: 1px solid var(--border-color);
+            transition: left 0.3s ease;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+        }
+        
+        .chat-sidebar.open {
+            left: 0;
+        }
+        
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .close-chat {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        
+        .message.bot {
+            background: var(--hover-color);
+            color: var(--text-color);
+        }
+        
+        .message.user {
+            background: var(--accent-color);
+            color: white;
+            margin-left: auto;
+        }
+        
+        .chat-input-container {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--accent-color);
+        }
+        
+        .send-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .info-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            z-index: 60;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .info-popup.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .popup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .popup-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+        
+        .popup-subtitle {
+            font-size: 16px;
+            color: var(--text-color);
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 8px;
+        }
+        
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: var(--accent-color);
+        }
+        
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .popup-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .popup-btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .popup-btn.primary {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .popup-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        .popup-btn.secondary {
+            background: var(--hover-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .popup-btn.secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .life-coach-interface {
+            display: none;
+        }
+        
+        .life-coach-interface.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+        
+        .coach-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .coach-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(40,167,69,0.3);
+        }
+        
+        .coach-circle.active {
+            animation: pulse-green 2s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(40,167,69,0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(40,167,69,0); }
+            100% { box-shadow: 0 0 0 0 rgba(40,167,69,0); }
+        }
+        
+        .coach-icon {
+            font-size: 48px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <button class="theme-toggle" onclick="toggleTheme()">● Dark Mode</button>
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('voice')">Voice Chat</button>
+            <button class="nav-tab" onclick="switchTab('resources')">Social Resources</button>
+            <button class="nav-tab" onclick="switchTab('coach')">Life Coach</button>
+        </div>
+        <div></div>
+    </div>
+
+    <div class="main-container">
+        <div class="welcome-text">
+            Welcome Back, Alex!
+        </div>
+
+        <!-- Voice Chat Interface -->
+        <div class="chat-interface" id="voiceChatInterface">
+            <div class="voice-circle-container">
+                <div class="logo-text">For Social Change</div>
+                <div class="voice-circle listening" onclick="toggleVoice()">
+                    <div class="voice-icon">🎤</div>
+                </div>
+            </div>
+            
+            <div class="voice-status" id="voiceStatus">
+                Listening... Tap to speak
+            </div>
+            
+            <button class="message-button" onclick="openChat()">
+                💬 Switch to Text Chat
+            </button>
+            
+            <div class="quick-actions">
+                <div class="quick-action">
+                    <span class="quick-action-icon">🏠</span>
+                    <div class="quick-action-text">Find Shelter</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">🍽️</span>
+                    <div class="quick-action-text">Food Resources</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">💊</span>
+                    <div class="quick-action-text">Healthcare</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">💼</span>
+                    <div class="quick-action-text">Job Assistance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Life Coach Interface -->
+        <div class="life-coach-interface" id="lifeCoachInterface">
+            <div class="voice-circle-container">
+                <div class="logo-text">For Social Change</div>
+                <div class="coach-circle" onclick="toggleCoach()">
+                    <div class="coach-icon">🧠</div>
+                </div>
+            </div>
+            
+            <div class="voice-status" id="coachStatus">
+                Your Life Coach is ready... Tap to start
+            </div>
+            
+            <button class="message-button" onclick="openCoachChat()">
+                💬 Switch to Text Chat
+            </button>
+            
+            <div class="quick-actions">
+                <div class="quick-action">
+                    <span class="quick-action-icon">🎯</span>
+                    <div class="quick-action-text">Set Goals</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">📝</span>
+                    <div class="quick-action-text">Journal Entry</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">💪</span>
+                    <div class="quick-action-text">Progress Check</div>
+                </div>
+                <div class="quick-action">
+                    <span class="quick-action-icon">🧘</span>
+                    <div class="quick-action-text">Mindfulness</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" onclick="closePopups()"></div>
+    
+    <!-- Information Popup -->
+    <div class="info-popup" id="infoPopup">
+        <div class="popup-header">
+            <div class="popup-title">Welcome to For Social Change</div>
+            <div class="popup-subtitle">Help us personalize your experience by sharing some basic information. This helps our AI provide more accurate and relevant support.</div>
+        </div>
+        
+        <form id="userInfoForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-input" placeholder="Enter your name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" placeholder="(555) 123-4567">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" class="form-input" placeholder="your.email@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Location/Area</label>
+                <input type="text" class="form-input" placeholder="e.g., Berkeley, Oakland, San Francisco">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Situation</label>
+                <select class="form-select">
+                    <option value="">Select your current housing situation</option>
+                    <option value="housed">Temporarily housed</option>
+                    <option value="shelter">In shelter</option>
+                    <option value="unsheltered">Unsheltered</option>
+                    <option value="transitional">Transitional housing</option>
+                    <option value="risk">At risk of homelessness</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Previous Services Used (Optional)</label>
+                <textarea class="form-textarea" placeholder="Tell us about any shelters, clinics, programs, or services you've used before. This helps us avoid suggesting places that weren't a good fit."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Primary Support Needs</label>
+                <select class="form-select">
+                    <option value="">What do you need most help with?</option>
+                    <option value="housing">Housing/Shelter</option>
+                    <option value="healthcare">Healthcare/Mental Health</option>
+                    <option value="addiction">Addiction Recovery</option>
+                    <option value="employment">Job Search/Employment</option>
+                    <option value="benefits">Government Benefits</option>
+                    <option value="food">Food/Basic Needs</option>
+                    <option value="multiple">Multiple areas</option>
+                </select>
+            </div>
+        </form>
+        
+        <div class="popup-buttons">
+            <button class="popup-btn secondary" onclick="skipSetup()">Skip for Now</button>
+            <button class="popup-btn primary" onclick="saveUserInfo()">Get Started</button>
+        </div>
+    </div>
+    
+    <div class="chat-sidebar">
+        <div class="chat-header">
+            <div class="chat-title">Chat Assistant</div>
+            <button class="close-chat" onclick="closeChat()">×</button>
+        </div>
+        
+        <div class="chat-messages">
+            <div class="message bot">
+                Hi Alex! I switched to text mode. How can I help you today? I can help you find resources, provide support, or just chat about how you're feeling.
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="chat-input">
+                <input type="text" placeholder="Type your message..." onkeypress="handleEnter(event)">
+                <button class="send-btn" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isListening = false;
+        let isDarkMode = false;
+        let isCoachActive = false;
+        let currentTab = 'voice';
+        let userInfo = {};
+        
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            document.querySelector('.theme-toggle').textContent = isDarkMode ? '○ Light Mode' : '● Dark Mode';
+        }
+        
+        function switchTab(tab) {
+            // Update nav tabs
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Hide all interfaces
+            document.getElementById('voiceChatInterface').style.display = 'none';
+            document.getElementById('lifeCoachInterface').classList.remove('active');
+            
+            currentTab = tab;
+            
+            if (tab === 'voice') {
+                document.getElementById('voiceChatInterface').style.display = 'flex';
+                document.getElementById('voiceChatInterface').style.flexDirection = 'column';
+                document.getElementById('voiceChatInterface').style.alignItems = 'center';
+                document.getElementById('voiceChatInterface').style.justifyContent = 'center';
+                document.getElementById('voiceChatInterface').style.minHeight = '60vh';
+            } else if (tab === 'coach') {
+                document.getElementById('lifeCoachInterface').classList.add('active');
+            } else if (tab === 'resources') {
+                // TODO: Implement resources tab
+                alert('Social Resources tab coming soon!');
+            }
+        }
+        
+        function toggleVoice() {
+            isListening = !isListening;
+            const circle = document.querySelector('.voice-circle');
+            const status = document.getElementById('voiceStatus');
+            
+            if (isListening) {
+                circle.classList.add('listening');
+                status.textContent = 'Listening... Speak now';
+                // Simulate voice recognition
+                setTimeout(() => {
+                    status.textContent = 'Processing...';
+                    setTimeout(() => {
+                        status.textContent = 'Tap to speak again';
+                        circle.classList.remove('listening');
+                        isListening = false;
+                    }, 2000);
+                }, 3000);
+            } else {
+                circle.classList.remove('listening');
+                status.textContent = 'Tap to speak';
+            }
+        }
+        
+        function toggleCoach() {
+            isCoachActive = !isCoachActive;
+            const circle = document.querySelector('.coach-circle');
+            const status = document.getElementById('coachStatus');
+            
+            if (isCoachActive) {
+                circle.classList.add('active');
+                status.textContent = 'Life Coach is listening... Share what\'s on your mind';
+                // Simulate coach interaction
+                setTimeout(() => {
+                    status.textContent = 'Processing your thoughts...';
+                    setTimeout(() => {
+                        status.textContent = 'Ready for your next session';
+                        circle.classList.remove('active');
+                        isCoachActive = false;
+                    }, 3000);
+                }, 4000);
+            } else {
+                circle.classList.remove('active');
+                status.textContent = 'Your Life Coach is ready... Tap to start';
+            }
+        }
+        
+        function openChat() {
+            document.querySelector('.chat-sidebar').classList.add('open');
+            document.querySelector('.overlay').classList.add('active');
+            
+            // Update chat title based on current tab
+            const chatTitle = document.querySelector('.chat-title');
+            chatTitle.textContent = currentTab === 'voice' ? 'Voice Assistant' : 'Life Coach';
+        }
+        
+        function openCoachChat() {
+            openChat(); // Same functionality but will show Life Coach context
+        }
+        
+        function closePopups() {
+            document.querySelector('.chat-sidebar').classList.remove('open');
+            document.querySelector('.overlay').classList.remove('active');
+            document.querySelector('.info-popup').classList.remove('active');
+        }
+        
+        function closeChat() {
+            closePopups();
+        }
+        
+        function showInfoPopup() {
+            document.querySelector('.info-popup').classList.add('active');
+            document.querySelector('.overlay').classList.add('active');
+        }
+        
+        function skipSetup() {
+            closePopups();
+        }
+        
+        function saveUserInfo() {
+            const form = document.getElementById('userInfoForm');
+            
+            // Store user info for API calls
+            userInfo = {
+                name: form.querySelector('input[type="text"]').value,
+                phone: form.querySelector('input[type="tel"]').value,
+                email: form.querySelector('input[type="email"]').value,
+                location: form.querySelectorAll('input[type="text"]')[1].value,
+                situation: form.querySelector('select').value,
+                previousServices: form.querySelector('textarea').value,
+                needs: form.querySelectorAll('select')[1].value
+            };
+            
+            // Store in localStorage for persistence
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            
+            // Update welcome message if name provided
+            if (userInfo.name) {
+                document.querySelector('.welcome-text').textContent = `Welcome Back, ${userInfo.name}!`;
+            }
+            
+            closePopups();
+            
+            // Show confirmation message
+            setTimeout(() => {
+                alert('Profile saved! I can now provide more personalized assistance.');
+            }, 500);
+        }
+        
+        async function sendMessage() {
+            const input = document.querySelector('.chat-input input');
+            const message = input.value.trim();
+            if (message) {
+                addMessage(message, 'user');
+                input.value = '';
+                
+                // Show typing indicator
+                addTypingIndicator();
+                
+                try {
+                    // Determine prompt type based on current tab
+                    let promptType = 'empathetic_coach'; // Default
+                    if (currentTab === 'resources') {
+                        promptType = 'direct_assistant';
+                    }
+                    // Note: 'coach' tab uses empathetic_coach for warm coaching approach
+                    
+                    // Call Flask backend API
+                    const response = await fetch('http://localhost:5001/api/chat/message', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            context: userInfo,
+                            user_id: userInfo.user_id || null,
+                            prompt_type: promptType
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Remove typing indicator
+                    removeTypingIndicator();
+                    
+                    if (response.ok) {
+                        // Store user_id for future requests
+                        userInfo.user_id = data.user_id;
+                        addMessage(data.response, 'bot');
+                    } else {
+                        addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                    removeTypingIndicator();
+                    addMessage('Sorry, I could not connect to the server. Please check if the backend is running.', 'bot');
+                }
+            }
+        }
+        
+        function addMessage(text, sender) {
+            const messagesContainer = document.querySelector('.chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function addTypingIndicator() {
+            const messagesContainer = document.querySelector('.chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot typing-indicator';
+            typingDiv.innerHTML = '<span>●</span><span>●</span><span>●</span> Assistant is typing...';
+            typingDiv.id = 'typing-indicator';
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+        
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Show info popup on first load or load stored user info
+        window.addEventListener('load', () => {
+            // Check if user has already provided info in localStorage
+            const storedUserInfo = localStorage.getItem('userInfo');
+            let hasUserInfo = false;
+            
+            if (storedUserInfo) {
+                try {
+                    userInfo = JSON.parse(storedUserInfo);
+                    hasUserInfo = true;
+                    
+                    // Update welcome message if name provided
+                    if (userInfo.name) {
+                        document.querySelector('.welcome-text').textContent = `Welcome Back, ${userInfo.name}!`;
+                    }
+                } catch (error) {
+                    console.error('Error parsing stored user info:', error);
+                }
+            }
+            
+            if (!hasUserInfo) {
+                setTimeout(() => {
+                    showInfoPopup();
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html> 

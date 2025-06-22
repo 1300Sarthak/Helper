@@ -30,6 +30,7 @@ def send_message():
         message = data['message']
         context = data.get('context', {})
         user_id = data.get('user_id')
+        prompt_type = data.get('prompt_type', 'empathetic_coach')
 
         logger.info(f"Received chat message: {message[:50]}...")
 
@@ -53,13 +54,13 @@ def send_message():
         # Get emotion analysis for the message
         emotion_scores = score_emotional_state(message)
 
-        # Get Claude response with enhanced context
+        # Get Claude response with enhanced context and prompt type
         claude_response = get_support_response(message, {
             'name': user.name,
             'location': user.location,
             'situation': user.situation,
             'needs': user.needs
-        })
+        }, prompt_type)
 
         # Save conversation with emotion analysis in context
         conversation_context = {
