@@ -446,40 +446,30 @@
         }
         
         .message {
-            margin-bottom: 20px;
-            padding: 16px 20px;
-            border-radius: 18px;
-            max-width: 85%;
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.5;
             word-wrap: break-word;
-            position: relative;
-            animation: messageSlideIn 0.3s ease-out;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid transparent;
-            transition: all 0.2s ease;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
         
-        .message:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        .message ul {
+            padding-left: 25px;
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
         
-        @keyframes messageSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .message li {
+            margin-bottom: 6px;
         }
         
         .message.user {
-            background: linear-gradient(135deg, var(--accent-color), #00a8ff);
+            background: var(--accent-color);
             color: white;
+            align-self: flex-end;
             margin-left: auto;
-            border-bottom-right-radius: 6px;
-            text-align: right;
         }
         
         .message.bot {
@@ -695,7 +685,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 40;
+            z-index: 9999;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -717,7 +707,7 @@
             padding: 40px;
             width: 90%;
             max-width: 500px;
-            z-index: 60;
+            z-index: 10000;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             opacity: 0;
             pointer-events: none;
@@ -1192,8 +1182,7 @@
         </form>
         
         <div class="popup-buttons">
-            <button class="popup-btn secondary" onclick="skipSetup()">Skip for Now</button>
-            <button class="popup-btn primary" onclick="saveUserInfo()">Get Started</button>
+            <button class="popup-btn primary" onclick="saveUserInfo()">Complete Setup</button>
         </div>
     </div>
     
@@ -1638,22 +1627,65 @@
             document.querySelector('.overlay').classList.add('active');
         }
         
-        function skipSetup() {
-            closePopups();
-        }
-        
         function saveUserInfo() {
             const form = document.getElementById('userInfoForm');
             
+            // Get all form inputs
+            const nameInput = form.querySelector('input[type="text"]');
+            const phoneInput = form.querySelector('input[type="tel"]');
+            const emailInput = form.querySelector('input[type="email"]');
+            const locationInput = form.querySelectorAll('input[type="text"]')[1];
+            const situationSelect = form.querySelector('select');
+            const previousServicesTextarea = form.querySelector('textarea');
+            const needsSelect = form.querySelectorAll('select')[1];
+            
+            // Validate required fields
+            const errors = [];
+            
+            if (!nameInput.value.trim()) {
+                errors.push('First Name is required');
+                nameInput.style.borderColor = '#dc3545';
+            } else {
+                nameInput.style.borderColor = '';
+            }
+            
+            if (!locationInput.value.trim()) {
+                errors.push('Current Location/Area is required');
+                locationInput.style.borderColor = '#dc3545';
+            } else {
+                locationInput.style.borderColor = '';
+            }
+            
+            if (!situationSelect.value) {
+                errors.push('Current Situation is required');
+                situationSelect.style.borderColor = '#dc3545';
+            } else {
+                situationSelect.style.borderColor = '';
+            }
+            
+            if (!needsSelect.value) {
+                errors.push('Primary Support Needs is required');
+                needsSelect.style.borderColor = '#dc3545';
+            } else {
+                needsSelect.style.borderColor = '';
+            }
+            
+            // If there are validation errors, show them and don't proceed
+            if (errors.length > 0) {
+                alert('Please complete all required fields:\n\n' + errors.join('\n'));
+                return;
+            }
+            
             // Store user info for API calls
             userInfo = {
-                name: form.querySelector('input[type="text"]').value,
-                phone: form.querySelector('input[type="tel"]').value,
-                email: form.querySelector('input[type="email"]').value,
-                location: form.querySelectorAll('input[type="text"]')[1].value,
-                situation: form.querySelector('select').value,
-                previousServices: form.querySelector('textarea').value,
-                needs: form.querySelectorAll('select')[1].value
+                name: nameInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                email: emailInput.value.trim(),
+                location: locationInput.value.trim(),
+                situation: situationSelect.value,
+                previousServices: previousServicesTextarea.value.trim(),
+                needs: needsSelect.value,
+                justUpdated: true // Flag to reset history
             };
             
             // Store in localStorage for persistence
@@ -1705,6 +1737,12 @@
                         })
                     });
                     
+                    // After sending, remove the update flag
+                    if (userInfo.justUpdated) {
+                        delete userInfo.justUpdated;
+                        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                    }
+
                     const data = await response.json();
                     
                     // Remove typing indicator
@@ -1745,9 +1783,9 @@
                 modeTag.textContent = currentMode;
                 messageDiv.appendChild(modeTag);
                 
-                // Add the message text
+                // Add the formatted message text
                 const textDiv = document.createElement('div');
-                textDiv.textContent = text;
+                textDiv.innerHTML = formatBotMessage(text);
                 messageDiv.appendChild(textDiv);
             } else {
                 messageDiv.textContent = text;
@@ -1758,152 +1796,123 @@
         }
         
         function formatBotMessage(text) {
-            // Split message into main content and resource information
-            const { mainContent, resources } = extractResources(text);
-            
-            let formattedText = mainContent;
-            
-            // Format bold text (**text** -> <strong>text</strong>)
-            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // Format phone numbers as clickable links
-            formattedText = formattedText.replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1">$1</a>');
-            
-            // Format email addresses as clickable links
-            formattedText = formattedText.replace(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g, '<a href="mailto:$1">$1</a>');
-            
-            // Split into paragraphs for better readability
-            const paragraphs = formattedText.split('\n\n').filter(p => p.trim());
-            const paragraphHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
-            
-            let html = `<div class="message-content">${paragraphHTML}</div>`;
-            
-            // Add resource section if resources were found
-            if (resources.length > 0) {
-                html += generateResourceSection(resources);
-            }
-            
-            return html;
-        }
-        
-        function extractResources(text) {
-            const resources = [];
-            let mainContent = text;
-            
-            // Pattern to match resource blocks like:
-            // **Food Resources:** * **Alameda County Community Food Bank:** *
-            // **Address:** 7900 Edgewater Dr, Oakland, CA 94621 * **Phone:** (510) 635-3663
-            const resourcePattern = /\*\*(.*?):\*\*\s*\*\s*\*\*(.*?):\*\*\s*\*\s*\*\*Address:\*\*\s*(.*?)\s*\*\s*\*\*Phone:\*\*\s*(.*?)\s*\*\s*\*\*Hours:\*\*\s*(.*?)(?:\*|$)/g;
-            
-            let match;
-            while ((match = resourcePattern.exec(text)) !== null) {
-                const [fullMatch, category, name, address, phone, hours] = match;
+            const lines = text.split('\n');
+            let finalHtml = '';
+            let listLevel = 0; // 0 means not in a list
+
+            for (const line of lines) {
+                // Regex to find list items and their indentation
+                const listMatch = line.match(/^(\s*)-\s+(.*)/);
                 
-                resources.push({
-                    name: name.trim(),
-                    category: category.trim(),
-                    address: address.trim(),
-                    phone: phone.trim(),
-                    hours: hours.trim(),
-                    details: []
-                });
+                let processedLine = line;
+
+                // --- Block-level processing ---
                 
-                // Remove this resource block from main content
-                mainContent = mainContent.replace(fullMatch, '');
-            }
-            
-            // Alternative pattern for simpler resource mentions
-            if (resources.length === 0) {
-                // Look for organization names followed by contact info
-                const lines = text.split('\n');
-                let currentResource = null;
-                const contentLines = [];
-                
-                for (let line of lines) {
-                    line = line.trim();
+                // Headings
+                if (processedLine.trim().startsWith('## ')) {
+                    while (listLevel > 0) { finalHtml += '</ul>'; listLevel--; }
+                    processedLine = `<h2>${processedLine.trim().substring(3)}</h2>`;
+                } else if (processedLine.trim().startsWith('### ')) {
+                    while (listLevel > 0) { finalHtml += '</ul>'; listLevel--; }
+                    processedLine = `<h3>${processedLine.trim().substring(4)}</h3>`;
+                }
+                // Lists
+                else if (listMatch) {
+                    const itemContent = listMatch[2];
+                    const indentSpaces = listMatch[1].length;
+                    const itemLevel = Math.floor(indentSpaces / 2) + 1; // 2 spaces per level
+
+                    while (itemLevel > listLevel) {
+                        finalHtml += '<ul>';
+                        listLevel++;
+                    }
+                    while (itemLevel < listLevel) {
+                        finalHtml += '</ul>';
+                        listLevel--;
+                    }
                     
-                    // Check for organization names
-                    const orgMatch = line.match(/^([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/);
-                    if (orgMatch && !line.includes('Address:') && !line.includes('Phone:')) {
-                        if (currentResource) {
-                            resources.push(currentResource);
-                        }
-                        currentResource = {
-                            name: orgMatch[1].trim(),
-                            address: '',
-                            phone: '',
-                            hours: '',
-                            details: []
-                        };
-                        contentLines.push(line);
-                    } else if (currentResource && line.includes('Address:')) {
-                        currentResource.address = line.replace(/.*Address:\s*/, '').replace(/\s*Phone:.*/, '').trim();
-                        contentLines.push(line);
-                    } else if (currentResource && line.includes('Phone:')) {
-                        currentResource.phone = line.replace(/.*Phone:\s*/, '').replace(/\s*Hours:.*/, '').trim();
-                        contentLines.push(line);
-                    } else if (currentResource && line.includes('Hours:')) {
-                        currentResource.hours = line.replace(/.*Hours:\s*/, '').trim();
-                        contentLines.push(line);
+                    processedLine = `<li>${itemContent}</li>`;
+                } else {
+                    // Not a list item, so close any open lists
+                    while (listLevel > 0) {
+                        finalHtml += '</ul>';
+                        listLevel--;
+                    }
+                    
+                    // Paragraphs
+                    if (processedLine.trim()) {
+                        processedLine = `<p>${processedLine}</p>`;
                     } else {
-                        contentLines.push(line);
+                        // Empty lines for spacing
+                        processedLine = '<br>';
                     }
                 }
                 
-                if (currentResource) {
-                    resources.push(currentResource);
-                }
-                
-                // If we found resources this way, clean up the main content
-                if (resources.length > 0) {
-                    mainContent = contentLines.filter(line => {
-                        return !line.includes('Address:') && !line.includes('Phone:') && !line.includes('Hours:');
-                    }).join('\n');
-                }
+                // --- Inline-level processing on the now-tagged line ---
+                processedLine = processedLine
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g, '<a href="tel:$1" class="message-link">$1</a>')
+                    .replace(/(www\.[^\s]+)/g, '<a href="http://$1" target="_blank" rel="noopener noreferrer" class="message-link">$1</a>');
+
+                finalHtml += processedLine;
             }
-            
-            return {
-                mainContent: mainContent.replace(/\*\s*\*/g, '').trim(),
-                resources: resources
-            };
+
+            // Close any remaining open lists at the end of the text
+            while (listLevel > 0) {
+                finalHtml += '</ul>';
+                listLevel--;
+            }
+
+            return finalHtml;
         }
         
-        function generateResourceSection(resources) {
-            if (resources.length === 0) return '';
+        function extractResourceInfo(response) {
+            // Extract phone numbers and organization names from response
+            const phoneRegex = /(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g;
+            const phones = response.match(phoneRegex);
             
-            let html = '<div class="resource-section">';
-            html += '<div class="resource-title">📋 Available Resources</div>';
+            // Extract organization names
+            const orgRegex = /([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/g;
+            const orgs = response.match(orgRegex);
             
-            resources.forEach(resource => {
-                html += '<div class="resource-item">';
-                html += `<div class="resource-name">${resource.name}</div>`;
+            // Store for action buttons
+            if (phones && phones.length > 0) {
+                lastResourceInfo = {
+                    phone: phones[0],
+                    organization: orgs && orgs.length > 0 ? orgs[0] : 'Resource',
+                    text: response
+                };
+            }
+        }
+        
+        function makeCall() {
+            if (lastResourceInfo && lastResourceInfo.phone) {
+                // For mobile devices, this will open the phone app
+                window.location.href = `tel:${lastResourceInfo.phone}`;
+            } else {
+                alert('No phone number found in the last response. Please ask for specific contact information.');
+            }
+        }
+        
+        function sendEmail() {
+            if (lastResourceInfo) {
+                const subject = encodeURIComponent('Resource Information Request');
+                const body = encodeURIComponent(`Hi,\n\nI found your contact information through the Social Change Helper app. I'm interested in learning more about your services.\n\nThe information I received was:\n${lastResourceInfo.text}\n\nCould you please provide more details about how I can access your services?\n\nThank you,\n${userInfo.name || 'A community member'}`);
                 
-                let details = '';
-                if (resource.address) details += `📍 ${resource.address}<br>`;
-                if (resource.hours) details += `🕒 ${resource.hours}<br>`;
-                if (resource.details.length > 0) details += resource.details.join('<br>');
-                
-                if (details) {
-                    html += `<div class="resource-details">${details}</div>`;
-                }
-                
-                if (resource.phone || resource.address) {
-                    html += '<div class="resource-contact">';
-                    if (resource.phone) {
-                        html += `<a href="tel:${resource.phone}" class="contact-link">📞 Call</a>`;
-                    }
-                    if (resource.address) {
-                        const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(resource.address)}`;
-                        html += `<a href="${mapsUrl}" target="_blank" class="contact-link">📍 Directions</a>`;
-                    }
-                    html += '</div>';
-                }
-                
-                html += '</div>';
-            });
-            
-            html += '</div>';
-            return html;
+                // Open default email client
+                window.location.href = `mailto:?subject=${subject}&body=${body}`;
+            } else {
+                alert('No resource information available. Please ask for specific resources first.');
+            }
+        }
+        
+        // Function to handle quick action button clicks
+        function sendQuickMessage(message) {
+            // Add the message to the input field and send it
+            const inputField = document.querySelector('.chat-input input');
+            inputField.value = message;
+            sendMessage();
         }
         
         function addTypingIndicator() {
@@ -2022,54 +2031,6 @@
                 }, 1000);
             }
         });
-        
-        function extractResourceInfo(response) {
-            // Extract phone numbers and organization names from response
-            const phoneRegex = /(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g;
-            const phones = response.match(phoneRegex);
-            
-            // Extract organization names
-            const orgRegex = /([A-Z][^.]*(?:Center|Bank|Service|House|Shelter|Clinic|Organization|Foundation|Project|Community|Food)[^.]*)/g;
-            const orgs = response.match(orgRegex);
-            
-            // Store for action buttons
-            if (phones && phones.length > 0) {
-                lastResourceInfo = {
-                    phone: phones[0],
-                    organization: orgs && orgs.length > 0 ? orgs[0] : 'Resource',
-                    text: response
-                };
-            }
-        }
-        
-        function makeCall() {
-            if (lastResourceInfo && lastResourceInfo.phone) {
-                // For mobile devices, this will open the phone app
-                window.location.href = `tel:${lastResourceInfo.phone}`;
-            } else {
-                alert('No phone number found in the last response. Please ask for specific contact information.');
-            }
-        }
-        
-        function sendEmail() {
-            if (lastResourceInfo) {
-                const subject = encodeURIComponent('Resource Information Request');
-                const body = encodeURIComponent(`Hi,\n\nI found your contact information through the Social Change Helper app. I'm interested in learning more about your services.\n\nThe information I received was:\n${lastResourceInfo.text}\n\nCould you please provide more details about how I can access your services?\n\nThank you,\n${userInfo.name || 'A community member'}`);
-                
-                // Open default email client
-                window.location.href = `mailto:?subject=${subject}&body=${body}`;
-            } else {
-                alert('No resource information available. Please ask for specific resources first.');
-            }
-        }
-        
-        // Function to handle quick action button clicks
-        function sendQuickMessage(message) {
-            // Add the message to the input field and send it
-            const inputField = document.querySelector('.chat-input input');
-            inputField.value = message;
-            sendMessage();
-        }
     </script>
 </body>
 </html> 

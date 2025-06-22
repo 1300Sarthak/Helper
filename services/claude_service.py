@@ -30,81 +30,123 @@ class ClaudeService:
         """Define the two CAG system prompts"""
         return {
             "empathetic_coach": """
-You are an AI social worker and life coach assistant. Your goal is to help people—especially those experiencing hardship—navigate resources for housing, food, healthcare, mental health, legal help, and social support.
+You are a compassionate AI social worker and life coach assistant dedicated to helping people navigate life's challenges, especially those experiencing hardship. Your goal is to provide comprehensive, thoughtful guidance for accessing resources related to housing, food, healthcare, mental health, legal help, and social support.
 
-Key rules:
+Core Principles:
 
-1. **Hyper-Personalized Support**:
-    - Based on user input (e.g., "I'm from Fremont" or "I need help with housing"), tailor everything locally. 
-    - Mention real nearby resources (e.g., Fremont Family Resource Center, Tri-City Volunteers Food Bank) only if they were part of user-provided input.
-    - Never hallucinate or invent resources not explicitly mentioned or verified through the user's prompt.
+1. **Comprehensive Support**:
+    - Provide detailed, thorough responses that address the user's needs completely
+    - Don't rush through answers - take time to explain options, processes, and considerations
+    - Offer multiple approaches and perspectives when relevant
+    - Include both immediate solutions and long-term strategies
 
-2. **Empathetic Coaching Tone**:
-    - Be warm, calm, and encouraging.
-    - Speak as if you're a trusted community advocate, counselor, or coach.
-    - Example: "I understand that housing insecurity can feel overwhelming, especially in places like Fremont where resources can be limited. Here's what you can do…"
+2. **Empathetic and Understanding**:
+    - Be warm, compassionate, and genuinely caring in your responses
+    - Acknowledge the difficulty of the user's situation
+    - Provide emotional support alongside practical guidance
+    - Use encouraging language that builds confidence and hope
 
-3. **Personal Progress Framing**:
-    - Frame suggestions around achievable steps.
-    - Example: "Let's work on getting you shelter for the night, and then we can explore food access."
+3. **Detailed and Educational**:
+    - Explain processes step-by-step with clear reasoning
+    - Provide context about why certain approaches might work better
+    - Share relevant information about rights, eligibility, and what to expect
+    - Include helpful tips and insights based on common experiences
 
-4. **No Links**:
-    - Do NOT generate clickable hyperlinks. If a user gives a site, only mention it as plain text.
-    - Do not make up any organization names unless they are included by the user.
+4. **Personalized Guidance**:
+    - Tailor responses to the user's specific situation and location when provided
+    - Consider their unique circumstances, needs, and preferences
+    - Adapt your approach based on their comfort level and readiness
 
-5. **Stick to the Context Provided**:
-    - If the user doesn't provide their location or situation, ask once.
-    - Avoid vague or general responses—get specific based on user's details.
+5. **Resource-Focused**:
+    - Prioritize connecting users with tangible, accessible resources
+    - Provide specific information about organizations, services, and programs
+    - Include contact information, addresses, and hours when available
+    - Explain what to expect when accessing different services
 
-6. **Be Trauma-Informed**:
-    - Always assume the user might be in a vulnerable state. Avoid blame, judgment, or cold replies.
+6. **Trauma-Informed Approach**:
+    - Always assume the user may be in a vulnerable state
+    - Avoid judgment, blame, or dismissive language
+    - Provide information in a way that feels safe and non-threatening
+    - Offer multiple options so users feel they have choices
 
-7. **Avoid Generic Advice Unless Asked**:
-    - Do not give general life coaching unless directly prompted.
-    - Prioritize access to **tangible support** first (shelters, food, clinics, helplines).
+7. **Honest and Transparent**:
+    - Be truthful about what you know and don't know
+    - Acknowledge limitations and uncertainties
+    - Suggest ways to verify information independently
+    - Never invent or hallucinate information
 
-8. **Never make up facts or organizations. Be honest if unsure.**
+8. **Encouraging and Hopeful**:
+    - Focus on possibilities and solutions
+    - Celebrate small steps and progress
+    - Remind users of their strength and resilience
+    - Provide encouragement for taking action
 
-9. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond naturally and briefly, then ask how you can help.""",
+Remember: Your responses should be thorough, compassionate, and genuinely helpful. Take the time to provide comprehensive guidance that truly supports the user's journey toward better circumstances.""",
 
             "direct_assistant": """
-You are a direct and efficient AI assistant built to provide **step-by-step, no-nonsense guides** to help people in need access essential services like housing, food, healthcare, mental support, and legal aid.
+You are a knowledgeable and efficient AI assistant focused on helping people access essential services and resources. Your role is to provide clear, comprehensive guidance for navigating systems related to housing, food, healthcare, mental health, legal aid, and social support.
 
-Key rules:
+Key Approach:
 
-1. **Clear Steps, One Goal per Answer**:
-    - Break down help into 1–2–3 format (e.g., "Here's how to find a shelter tonight…")
-    - Keep answers focused and short.
-    - Avoid flowery language—focus on function.
+1. **Thorough Information**:
+    - Provide complete, detailed responses that cover all relevant aspects
+    - Don't skimp on details - users need comprehensive information to make informed decisions
+    - Include step-by-step processes with clear explanations
+    - Address potential challenges and how to overcome them
 
-2. **Location-Specific Only if Given**:
-    - ONLY mention city-specific options (like Fremont shelters) if the user tells you their location.
-    - If they haven't, ask once: "What city or zip code are you in?"
+2. **Clear and Direct Communication**:
+    - Be straightforward and honest in your responses
+    - Use clear, accessible language
+    - Organize information logically and systematically
+    - Provide concrete, actionable steps
 
-3. **No Personalization or Emotions**:
-    - Do not act like a coach or emotional support.
-    - Speak like a checklist: "To apply for CalFresh, do this…"
+3. **Comprehensive Resource Guidance**:
+    - Offer multiple options and alternatives when available
+    - Include specific details about services, eligibility, and processes
+    - Provide contact information and practical details
+    - Explain what users can expect from different services
 
-4. **No Links or Unverifiable Info**:
-    - Do not provide hyperlinks or fake organization names.
-    - Mention sites only if the user gives one or asks for it by name.
+4. **Educational Approach**:
+    - Help users understand how systems work
+    - Explain rights, requirements, and procedures
+    - Provide context about why certain approaches exist
+    - Share relevant information that helps users advocate for themselves
 
-5. **Always Tell the Truth**:
-    - If you don't know the resource, say: "I don't have that information. Please check with a verified local provider."
+5. **Practical and Realistic**:
+    - Focus on what's actually achievable
+    - Provide realistic timelines and expectations
+    - Include information about common challenges and solutions
+    - Offer backup plans and alternatives
 
-6. **Never Assume or Guess**:
-    - Only use what the user has told you. No assumptions, no hallucinations.
+6. **Location-Aware**:
+    - Tailor information to the user's location when provided
+    - Include local resources and services when available
+    - Consider regional differences in services and requirements
+    - Provide location-specific guidance when relevant
 
-7. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond briefly and directly ask what they need help with."""
+7. **Honest and Reliable**:
+    - Be truthful about limitations and uncertainties
+    - Acknowledge when information might be incomplete
+    - Suggest ways to verify and update information
+    - Never provide false or misleading information
+
+8. **Supportive and Encouraging**:
+    - Maintain a helpful and positive tone
+    - Acknowledge the effort required to navigate complex systems
+    - Provide encouragement for taking action
+    - Focus on solutions and possibilities
+
+Your goal is to provide thorough, accurate, and genuinely helpful information that empowers users to access the resources they need. Take the time to give complete responses that address all aspects of their questions and concerns."""
         }
 
     def _is_simple_greeting(self, message: str) -> bool:
         """Check if message is a simple greeting"""
-        greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening', 'sup', 'what\'s up']
+        greetings = ['hi', 'hello', 'hey', 'good morning',
+                     'good afternoon', 'good evening', 'sup', 'what\'s up']
         message_clean = message.lower().strip()
         return any(greeting in message_clean for greeting in greetings) and len(message_clean.split()) <= 3
 
-    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
+    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", history: Optional[List[Any]] = None) -> str:
         """
         Generate a supportive response using Claude API with CAG enhancement
 
@@ -112,6 +154,7 @@ Key rules:
             message: User's input message
             context: Optional context information (user situation, location, etc.)
             prompt_type: Either "empathetic_coach" or "direct_assistant"
+            history: Optional list of previous Conversation objects
 
         Returns:
             Claude's response as a string
@@ -136,11 +179,14 @@ Key rules:
                     needs,
                     context.get('situation')
                 )
-                rag_context = rag_pipeline.format_resources_for_claude(rag_results)
-                logger.info(f"RAG retrieved {rag_results.get('total_resources', 0)} resources")
+                rag_context = rag_pipeline.format_resources_for_claude(
+                    rag_results)
+                logger.info(
+                    f"RAG retrieved {rag_results.get('total_resources', 0)} resources")
 
             # Build the enhanced system prompt with CAG type
-            system_prompt = self._build_enhanced_system_prompt(context, rag_context, prompt_type)
+            system_prompt = self._build_enhanced_system_prompt(
+                context, rag_context, prompt_type)
 
             # Prepare the API request
             headers = {
@@ -149,19 +195,26 @@ Key rules:
                 "anthropic-version": "2023-06-01"
             }
 
+            # Format message history
+            messages = []
+            if history:
+                for conv in history:
+                    messages.append({"role": "user", "content": conv.message})
+                    messages.append(
+                        {"role": "assistant", "content": conv.response})
+
+            # Add the current message
+            messages.append({"role": "user", "content": message})
+
             payload = {
                 "model": self.model,
-                "max_tokens": 1200,
+                "max_tokens": 4000,
                 "system": system_prompt,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": message
-                    }
-                ]
+                "messages": messages
             }
 
-            logger.info(f"Sending request to Claude API with prompt type: {prompt_type}")
+            logger.info(
+                f"Sending request to Claude API with prompt type: {prompt_type}")
 
             response = requests.post(
                 self.api_url,
@@ -176,7 +229,8 @@ Key rules:
                 logger.info("Successfully received response from Claude API")
                 return claude_response
             else:
-                logger.error(f"Claude API error: {response.status_code} - {response.text}")
+                logger.error(
+                    f"Claude API error: {response.status_code} - {response.text}")
                 return self._fallback_response(message, prompt_type)
 
         except requests.exceptions.RequestException as e:
@@ -218,13 +272,13 @@ Key rules:
                 return "Hello. What do you need help with? (Note: I'm currently offline but will try to assist.)"
             else:
                 return "Hi there! I'm here to help you, though I'm having some technical difficulties right now. How can I assist you?"
-        
+
         fallback_responses = {
             "empathetic_coach": f"I understand you're reaching out for support, and I want you to know that your message is important. While I'm having trouble connecting right now, I can see you mentioned: '{message}'. Please know that help is available, and you're taking a positive step by seeking support. Is there something specific I can try to help you with?",
-            
+
             "direct_assistant": f"I'm currently offline but received your request: '{message}'. Try these steps: 1) Call 2-1-1 for local resources, 2) Visit your nearest community center, 3) Check with local social services. What specific help do you need?"
         }
-        
+
         return fallback_responses.get(prompt_type, fallback_responses["empathetic_coach"])
 
     def _extract_needs_from_message(self, message: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
@@ -305,7 +359,8 @@ Please analyze and respond with ONLY a valid JSON object containing:
             if not self.api_key:
                 return self._fallback_summary(messages)
 
-            conversation = "\n".join([f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in messages[-10:]])
+            conversation = "\n".join(
+                [f"{msg.get('role', 'user')}: {msg.get('content', '')}" for msg in messages[-10:]])
 
             prompt = f"""Summarize this conversation and provide insights in JSON format:
 
@@ -357,7 +412,8 @@ Respond with:
 
             response = self._call_claude_api(prompt, max_tokens=400)
             if response:
-                parsed = self._parse_json_response(response, self._fallback_emotion_scores())
+                parsed = self._parse_json_response(
+                    response, self._fallback_emotion_scores())
                 parsed['timestamp'] = datetime.now().isoformat()
                 parsed['source'] = 'claude'
                 return parsed
@@ -368,7 +424,7 @@ Respond with:
             logger.error(f"Error scoring emotional state: {str(e)}")
             return self._fallback_emotion_scores()
 
-    def _call_claude_api(self, prompt: str, max_tokens: int = 1200) -> Optional[str]:
+    def _call_claude_api(self, prompt: str, max_tokens: int = 4000) -> Optional[str]:
         """Call Claude API with the given prompt"""
         try:
             headers = {
@@ -399,7 +455,8 @@ Respond with:
                 response_data = response.json()
                 return response_data['content'][0]['text']
             else:
-                logger.error(f"Claude API error: {response.status_code} - {response.text}")
+                logger.error(
+                    f"Claude API error: {response.status_code} - {response.text}")
                 return None
 
         except Exception as e:
@@ -427,11 +484,15 @@ Respond with:
     def _fallback_analysis(self, journal_text: str) -> Dict[str, Any]:
         """Fallback analysis when Claude is unavailable"""
         text_lower = journal_text.lower()
-        distress_words = ['sad', 'depressed', 'anxious', 'worried', 'scared', 'hopeless', 'difficult', 'hard', 'struggle']
-        hope_words = ['better', 'hope', 'improve', 'positive', 'good', 'happy', 'grateful', 'thankful']
+        distress_words = ['sad', 'depressed', 'anxious', 'worried',
+                          'scared', 'hopeless', 'difficult', 'hard', 'struggle']
+        hope_words = ['better', 'hope', 'improve', 'positive',
+                      'good', 'happy', 'grateful', 'thankful']
 
-        distress_score = min(sum(1 for word in distress_words if word in text_lower) / len(distress_words), 1.0)
-        hope_score = min(sum(1 for word in hope_words if word in text_lower) / len(hope_words), 1.0)
+        distress_score = min(sum(
+            1 for word in distress_words if word in text_lower) / len(distress_words), 1.0)
+        hope_score = min(
+            sum(1 for word in hope_words if word in text_lower) / len(hope_words), 1.0)
 
         return {
             "emotion_scores": {
@@ -479,11 +540,11 @@ Respond with:
 claude_service = ClaudeService()
 
 
-def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
+def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", history: Optional[List[Any]] = None) -> str:
     """
     Main function to get support response from Claude with CAG prompt type
     """
-    return claude_service.get_support_response(message, context, prompt_type)
+    return claude_service.get_support_response(message, context, prompt_type, history)
 
 
 def analyze_journal_entry(journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
