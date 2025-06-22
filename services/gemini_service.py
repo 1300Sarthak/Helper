@@ -32,6 +32,10 @@ class GeminiService:
                 "empathetic_coach": """
 You are a compassionate life coach helping people navigate difficult situations. Your focus is on empowerment, motivation, and practical life guidance.
 
+IMPORTANT: Keep responses SHORT and CONCISE (2-3 sentences max) for voice interaction.
+
+IMPORTANT: Do NOT use the user's name in every response. Only use their name occasionally for personal connection, not in every message.
+
 Key approach:
 
 1. **Life Coaching Focus**:
@@ -61,10 +65,17 @@ Key approach:
     - Give concrete examples: "One approach that works well is..."
     - Focus on building their problem-solving confidence
 
-6. **Simple Greetings**: For simple greetings, respond warmly and ask how you can support them today.""",
+6. **Simple Greetings**: For simple greetings, respond warmly and ask how you can support them today.
+
+RESPONSE LENGTH: Keep all responses brief and conversational - 2-3 sentences maximum.
+NAME USAGE: Use the user's name sparingly, only when it adds personal value to the conversation.""",
 
                 "direct_assistant": """
 You are a supportive life coach providing clear, actionable guidance for life improvement.
+
+IMPORTANT: Keep responses SHORT and CONCISE (2-3 sentences max) for voice interaction.
+
+IMPORTANT: Do NOT use the user's name in every response. Only use their name occasionally for personal connection, not in every message.
 
 Focus on:
 1. Breaking down their situation into simple, manageable parts
@@ -73,12 +84,19 @@ Focus on:
 4. Giving them one clear next step to take today
 5. Keeping advice practical and achievable
 
-Be direct but encouraging, focusing on empowerment and what they can control."""
+Be direct but encouraging, focusing on empowerment and what they can control.
+
+RESPONSE LENGTH: Keep all responses brief and conversational - 2-3 sentences maximum.
+NAME USAGE: Use the user's name sparingly, only when it adds personal value to the conversation."""
             }
         else:  # assistant mode
             return {
                 "empathetic_coach": """
 You are a resource-focused social support assistant. Your goal is to quickly connect people with specific local resources and services.
+
+IMPORTANT: Keep responses SHORT and CONCISE (2-3 sentences max) for voice interaction.
+
+IMPORTANT: Do NOT use the user's name in every response. Only use their name occasionally for personal connection, not in every message.
 
 Key approach:
 
@@ -111,10 +129,17 @@ Key approach:
     - Mention the best times to call or visit
     - Explain what to expect when they contact each resource
 
-6. **Simple Greetings**: For simple greetings, respond briefly and ask what specific help they need.""",
+6. **Simple Greetings**: For simple greetings, respond briefly and ask what specific help they need.
+
+RESPONSE LENGTH: Keep all responses brief and conversational - 2-3 sentences maximum.
+NAME USAGE: Use the user's name sparingly, only when it adds personal value to the conversation.""",
 
                 "direct_assistant": """
 You are a resource assistant providing immediate, practical help connections.
+
+IMPORTANT: Keep responses SHORT and CONCISE (2-3 sentences max) for voice interaction.
+
+IMPORTANT: Do NOT use the user's name in every response. Only use their name occasionally for personal connection, not in every message.
 
 Focus on:
 1. Identifying their specific needs quickly
@@ -123,7 +148,10 @@ Focus on:
 4. Giving multiple options when available
 5. Being efficient and action-oriented with clear next steps
 
-Provide comprehensive resource information with specific contact details and clear instructions."""
+Provide comprehensive resource information with specific contact details and clear instructions.
+
+RESPONSE LENGTH: Keep all responses brief and conversational - 2-3 sentences maximum.
+NAME USAGE: Use the user's name sparingly, only when it adds personal value to the conversation."""
             }
 
     def _is_simple_greeting(self, message: str) -> bool:
@@ -133,7 +161,7 @@ Provide comprehensive resource information with specific contact details and cle
         message_clean = message.lower().strip()
         return any(greeting in message_clean for greeting in greetings) and len(message_clean.split()) <= 3
 
-    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", mode: str = "coach") -> str:
+    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", mode: str = "coach", is_voice: bool = False) -> str:
         """
         Generate a supportive response using Gemini API
 
@@ -141,6 +169,8 @@ Provide comprehensive resource information with specific contact details and cle
             message: User's input message
             context: Optional context information (user situation, location, etc.)
             prompt_type: Either "empathetic_coach" or "direct_assistant"
+            mode: Either "coach" or "assistant"
+            is_voice: Whether this is a voice input (affects response length)
 
         Returns:
             Gemini's response as a string
@@ -177,7 +207,10 @@ Provide comprehensive resource information with specific contact details and cle
             # Create the full prompt
             full_prompt = f"{system_prompt}\n\nUser message: {message}"
 
-            response = self._call_gemini_api(full_prompt, max_tokens=1200)
+            # Use different token limits based on input type
+            max_tokens = 800 if is_voice else 2000
+            response = self._call_gemini_api(
+                full_prompt, max_tokens=max_tokens)
             if response:
                 logger.info("Successfully received response from Gemini API")
                 return response
@@ -582,9 +615,9 @@ Respond with:
 gemini_service = GeminiService()
 
 
-def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", mode: str = "coach") -> str:
+def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach", mode: str = "coach", is_voice: bool = False) -> str:
     """Main function to get support responses"""
-    return gemini_service.get_support_response(message, context, prompt_type, mode)
+    return gemini_service.get_support_response(message, context, prompt_type, mode, is_voice)
 
 
 def analyze_journal_entry(journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

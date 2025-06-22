@@ -63,7 +63,7 @@ def send_message():
             'location': user.location,
             'situation': user.situation,
             'needs': user.needs
-        }, prompt_type, mode)
+        }, prompt_type, mode, data.get('is_voice', False))
 
         # Save conversation with emotion analysis in context
         conversation_context = {

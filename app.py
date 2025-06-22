@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, redirect
+from flask import Flask, jsonify, redirect, send_from_directory
 from flask_cors import CORS
 import os
 from datetime import datetime
@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Enable CORS for frontend connection
-CORS(app, origins=["http://localhost:8000", "http://127.0.0.1:8000"])
+CORS(app, origins=["http://localhost:8000", "http://127.0.0.1:8000",
+     "http://localhost:5001", "http://127.0.0.1:5001"])
 
 # Load configuration
 config_name = os.environ.get('FLASK_ENV', 'default')
@@ -41,13 +42,8 @@ with app.app_context():
 
 @app.route('/')
 def home():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'success',
-        'message': 'Social Change Helper API is running',
-        'timestamp': datetime.now().isoformat(),
-        'version': '1.0.0'
-    })
+    """Serve the frontend HTML file"""
+    return send_from_directory('.', 'index.html')
 
 
 @app.route('/ping')
