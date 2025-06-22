@@ -11,7 +11,10 @@ class Config:
     DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
     PORT = int(os.environ.get('PORT', 5001))
 
-    # CAG Chatbot Configuration
+    # Gemini API Configuration
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', None)
+
+    # Legacy CAG Configuration (if needed)
     CAG_API_KEY = os.environ.get('CAG_API_KEY', None)
     CAG_MODEL_NAME = os.environ.get('CAG_MODEL_NAME', 'default-model')
     CAG_API_URL = os.environ.get('CAG_API_URL', 'https://api.cag.example.com')

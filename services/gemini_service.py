@@ -1,4 +1,4 @@
-# Gemini summarization/emotion scoring
+# Gemini Service - Complete AI assistant functionality
 
 import os
 import logging
@@ -7,6 +7,7 @@ import requests
 import json
 from dotenv import load_dotenv
 from datetime import datetime
+from .rag_pipeline import rag_pipeline
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class GeminiService:
-    """Service for interacting with Google Gemini API for summarization and emotion analysis"""
+    """Service for interacting with Google Gemini API for complete AI assistant functionality"""
 
     def __init__(self):
         self.api_key = os.environ.get('GEMINI_API_KEY')
@@ -23,6 +24,206 @@ class GeminiService:
 
         if not self.api_key:
             logger.warning("GEMINI_API_KEY not set in environment variables")
+
+    def _get_system_prompts(self) -> Dict[str, str]:
+        """Define the two system prompts for different interaction styles"""
+        return {
+            "empathetic_coach": """
+You are an AI social worker and life coach assistant. Your goal is to help people—especially those experiencing hardship—navigate resources for housing, food, healthcare, mental health, legal help, and social support.
+
+Key rules:
+
+1. **Hyper-Personalized Support**:
+    - Based on user input (e.g., "I'm from Fremont" or "I need help with housing"), tailor everything locally. 
+    - Mention real nearby resources (e.g., Fremont Family Resource Center, Tri-City Volunteers Food Bank) only if they were part of user-provided input.
+    - Never hallucinate or invent resources not explicitly mentioned or verified through the user's prompt.
+
+2. **Empathetic Coaching Tone**:
+    - Be warm, calm, and encouraging.
+    - Speak as if you're a trusted community advocate, counselor, or coach.
+    - Example: "I understand that housing insecurity can feel overwhelming, especially in places like Fremont where resources can be limited. Here's what you can do…"
+
+3. **Personal Progress Framing**:
+    - Frame suggestions around achievable steps.
+    - Example: "Let's work on getting you shelter for the night, and then we can explore food access."
+
+4. **No Links**:
+    - Do NOT generate clickable hyperlinks. If a user gives a site, only mention it as plain text.
+    - Do not make up any organization names unless they are included by the user.
+
+5. **Stick to the Context Provided**:
+    - If the user doesn't provide their location or situation, ask once.
+    - Avoid vague or general responses—get specific based on user's details.
+
+6. **Be Trauma-Informed**:
+    - Always assume the user might be in a vulnerable state. Avoid blame, judgment, or cold replies.
+
+7. **Avoid Generic Advice Unless Asked**:
+    - Do not give general life coaching unless directly prompted.
+    - Prioritize access to **tangible support** first (shelters, food, clinics, helplines).
+
+8. **Never make up facts or organizations. Be honest if unsure.**
+
+9. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond naturally and briefly, then ask how you can help.""",
+
+            "direct_assistant": """
+You are a direct and efficient AI assistant built to provide **step-by-step, no-nonsense guides** to help people in need access essential services like housing, food, healthcare, mental support, and legal aid.
+
+Key rules:
+
+1. **Clear Steps, One Goal per Answer**:
+    - Break down help into 1–2–3 format (e.g., "Here's how to find a shelter tonight…")
+    - Keep answers focused and short.
+    - Avoid flowery language—focus on function.
+
+2. **Location-Specific Only if Given**:
+    - ONLY mention city-specific options (like Fremont shelters) if the user tells you their location.
+    - If they haven't, ask once: "What city or zip code are you in?"
+
+3. **No Personalization or Emotions**:
+    - Do not act like a coach or emotional support.
+    - Speak like a checklist: "To apply for CalFresh, do this…"
+
+4. **No Links or Unverifiable Info**:
+    - Do not provide hyperlinks or fake organization names.
+    - Mention sites only if the user gives one or asks for it by name.
+
+5. **Always Tell the Truth**:
+    - If you don't know the resource, say: "I don't have that information. Please check with a verified local provider."
+
+6. **Never Assume or Guess**:
+    - Only use what the user has told you. No assumptions, no hallucinations.
+
+7. **Simple Greetings**: For simple greetings like "hello", "hi", "hey" respond briefly and directly ask what they need help with."""
+        }
+
+    def _is_simple_greeting(self, message: str) -> bool:
+        """Check if message is a simple greeting"""
+        greetings = ['hi', 'hello', 'hey', 'good morning',
+                     'good afternoon', 'good evening', 'sup', 'what\'s up']
+        message_clean = message.lower().strip()
+        return any(greeting in message_clean for greeting in greetings) and len(message_clean.split()) <= 3
+
+    def get_support_response(self, message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
+        """
+        Generate a supportive response using Gemini API
+
+        Args:
+            message: User's input message
+            context: Optional context information (user situation, location, etc.)
+            prompt_type: Either "empathetic_coach" or "direct_assistant"
+
+        Returns:
+            Gemini's response as a string
+        """
+        try:
+            if not self.api_key:
+                return self._fallback_response(message, prompt_type)
+
+            # Handle simple greetings naturally
+            if self._is_simple_greeting(message):
+                if prompt_type == "direct_assistant":
+                    return "Hello. What do you need help with?"
+                else:
+                    return "Hi there! I'm here to help you navigate resources and support. What can I assist you with today?"
+
+            # Get local resources via RAG pipeline
+            rag_context = ""
+            if context and context.get('location'):
+                needs = self._extract_needs_from_message(message, context)
+                rag_results = rag_pipeline.retrieve_resources(
+                    context.get('location'),
+                    needs,
+                    context.get('situation')
+                )
+                rag_context = rag_pipeline.format_resources_for_gemini(
+                    rag_results)
+                logger.info(
+                    f"RAG retrieved {rag_results.get('total_resources', 0)} resources")
+
+            # Build the enhanced system prompt
+            system_prompt = self._build_enhanced_system_prompt(
+                context, rag_context, prompt_type)
+
+            # Create the full prompt
+            full_prompt = f"{system_prompt}\n\nUser message: {message}"
+
+            response = self._call_gemini_api(full_prompt, max_tokens=1200)
+            if response:
+                logger.info("Successfully received response from Gemini API")
+                return response
+            else:
+                return self._fallback_response(message, prompt_type)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in Gemini service: {str(e)}")
+            return self._fallback_response(message, prompt_type)
+
+    def _build_enhanced_system_prompt(self, context: Optional[Dict[str, Any]] = None, rag_context: str = "", prompt_type: str = "empathetic_coach") -> str:
+        """Build enhanced system prompt with RAG context and prompt type"""
+        prompts = self._get_system_prompts()
+        base_prompt = prompts.get(prompt_type, prompts["empathetic_coach"])
+
+        # Add user context
+        if context:
+            context_info = ""
+            if context.get('location'):
+                context_info += f"\nUser location: {context['location']}"
+            if context.get('situation'):
+                context_info += f"\nUser situation: {context['situation']}"
+            if context.get('needs'):
+                context_info += f"\nUser needs: {context['needs']}"
+            if context.get('name'):
+                context_info += f"\nUser name: {context['name']}"
+
+            if context_info:
+                base_prompt += f"\n\nCURRENT USER CONTEXT:{context_info}"
+
+        # Add RAG context if available
+        if rag_context:
+            base_prompt += f"\n\nAVAILABLE LOCAL RESOURCES:\n{rag_context}"
+
+        return base_prompt
+
+    def _fallback_response(self, message: str, prompt_type: str = "empathetic_coach") -> str:
+        """Fallback response when Gemini is unavailable"""
+        if prompt_type == "direct_assistant":
+            return "I'm currently unable to access my full capabilities. Please try again later or contact local support services directly."
+        else:
+            return "I understand you're reaching out for support. While I'm having technical difficulties right now, please don't hesitate to contact local community resources or crisis lines if you need immediate assistance."
+
+    def _extract_needs_from_message(self, message: str, context: Optional[Dict[str, Any]] = None) -> List[str]:
+        """Extract needs/categories from user message"""
+        message_lower = message.lower()
+        needs = []
+
+        # Basic keyword matching
+        if any(word in message_lower for word in ['food', 'hungry', 'eat', 'meal', 'grocery']):
+            needs.append('food')
+        if any(word in message_lower for word in ['housing', 'shelter', 'homeless', 'place to stay', 'rent']):
+            needs.append('housing')
+        if any(word in message_lower for word in ['health', 'medical', 'doctor', 'clinic', 'sick']):
+            needs.append('health')
+        if any(word in message_lower for word in ['job', 'work', 'employment', 'income']):
+            needs.append('employment')
+        if any(word in message_lower for word in ['mental', 'therapy', 'counseling', 'depression', 'anxiety']):
+            needs.append('mental_health')
+        if any(word in message_lower for word in ['legal', 'lawyer', 'immigration', 'eviction']):
+            needs.append('legal')
+
+        # Default to general if no specific needs detected
+        if not needs:
+            needs = ['general']
+
+        # Add context-based needs
+        if context and context.get('needs'):
+            context_needs = context['needs'].lower()
+            if 'food' in context_needs and 'food' not in needs:
+                needs.append('food')
+            if 'housing' in context_needs and 'housing' not in needs:
+                needs.append('housing')
+
+        return needs
 
     def analyze_journal_entry(self, journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
@@ -106,7 +307,7 @@ class GeminiService:
             logger.error(f"Error scoring emotional state: {str(e)}")
             return self._fallback_emotion_scores()
 
-    def _call_gemini_api(self, prompt: str) -> Optional[str]:
+    def _call_gemini_api(self, prompt: str, max_tokens: int = 1024) -> Optional[str]:
         """Make API call to Gemini"""
         try:
             headers = {
@@ -123,7 +324,7 @@ class GeminiService:
                     "temperature": 0.3,
                     "topK": 40,
                     "topP": 0.95,
-                    "maxOutputTokens": 1024,
+                    "maxOutputTokens": max_tokens,
                 }
             }
 
@@ -350,6 +551,11 @@ Respond with:
 
 # Global instance
 gemini_service = GeminiService()
+
+
+def get_support_response(message: str, context: Optional[Dict[str, Any]] = None, prompt_type: str = "empathetic_coach") -> str:
+    """Main function to get support responses"""
+    return gemini_service.get_support_response(message, context, prompt_type)
 
 
 def analyze_journal_entry(journal_text: str, user_context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:

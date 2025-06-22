@@ -320,6 +320,10 @@ class RAGPipeline:
 
         return formatted
 
+    def format_resources_for_gemini(self, rag_results: Dict[str, Any]) -> str:
+        """Format RAG results for Gemini context (same format as Claude)"""
+        return self.format_resources_for_claude(rag_results)
+
 
 # Global RAG pipeline instance
 rag_pipeline = RAGPipeline()

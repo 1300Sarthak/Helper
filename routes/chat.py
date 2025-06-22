@@ -5,7 +5,7 @@ from datetime import datetime
 import logging
 from models.user import db, User
 from models.conversation import Conversation
-from services.claude_service import get_support_response, analyze_journal_entry, summarize_conversation, score_emotional_state
+from services.gemini_service import get_support_response, analyze_journal_entry, summarize_conversation, score_emotional_state
 from services.rag_pipeline import get_local_resources
 from typing import Optional, Dict, Any
 
@@ -54,8 +54,8 @@ def send_message():
         # Get emotion analysis for the message
         emotion_scores = score_emotional_state(message)
 
-        # Get Claude response with enhanced context and prompt type
-        claude_response = get_support_response(message, {
+        # Get Gemini response with enhanced context and prompt type
+        gemini_response = get_support_response(message, {
             'name': user.name,
             'location': user.location,
             'situation': user.situation,
@@ -71,7 +71,7 @@ def send_message():
         conversation = Conversation(
             user_id=user.id,
             message=message,
-            response=claude_response,
+            response=gemini_response,
             message_type='text',
             context=conversation_context
         )
@@ -81,7 +81,7 @@ def send_message():
         logger.info(f"Saved conversation for user {user.id}")
 
         return jsonify({
-            'response': claude_response,
+            'response': gemini_response,
             'user_id': user.id,
             'emotion_analysis': emotion_scores,
             'timestamp': conversation.created_at.isoformat()
@@ -127,7 +127,7 @@ def get_resources():
 @chat_bp.route('/api/chat/analyze-journal', methods=['POST'])
 def analyze_journal():
     """
-    Analyze journal entry using Claude for emotion scoring
+    Analyze journal entry using Gemini for emotion scoring
     """
     try:
         data = request.get_json()
@@ -140,7 +140,7 @@ def analyze_journal():
 
         logger.info(f"Analyzing journal entry: {journal_text[:50]}...")
 
-        # Analyze with Claude
+        # Analyze with Gemini
         analysis = analyze_journal_entry(journal_text, user_context)
 
         return jsonify({
@@ -157,7 +157,7 @@ def analyze_journal():
 @chat_bp.route('/api/chat/summarize/<int:user_id>', methods=['GET'])
 def summarize_user_conversation(user_id):
     """
-    Summarize a user's conversation history using Claude
+    Summarize a user's conversation history using Gemini
     """
     try:
         user = User.query.get(user_id)
@@ -172,13 +172,13 @@ def summarize_user_conversation(user_id):
         if not conversations:
             return jsonify({'error': 'No conversations found'}), 404
 
-        # Format messages for Claude
+        # Format messages for Gemini
         messages = []
         for conv in reversed(conversations):  # Reverse to get chronological order
             messages.append({'role': 'user', 'content': conv.message})
             messages.append({'role': 'assistant', 'content': conv.response})
 
-        # Get summary from Claude
+        # Get summary from Gemini
         summary = summarize_conversation(messages, {
             'location': user.location,
             'situation': user.situation,

@@ -198,7 +198,7 @@ def main():
     if success:
         print("🎯 Task 5 Requirements Met:")
         print("✅ Added chat.py in routes/ with POST /api/chat/message")
-        print("✅ Accepts message and user context, returns Claude response")
+        print("✅ Accepts message and user context, returns Gemini response")
         print("✅ POST JSON body test successful, got chat reply")
         print("\n🚀 Ready for next phase!")
     else:

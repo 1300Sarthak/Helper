@@ -32,8 +32,7 @@ social_change_app/
 │ │ ├── resources.py # /api/resources – Location-based service listings
 │ │ └── voice.py # /api/voice – basic speech-to-text handler (if needed)
 │ ├── services/
-│ │ ├── claude_service.py # Claude 4 calls, prompt templates
-│ │ ├── gemini_service.py # Gemini summarization/emotion scoring
+│ │ ├── gemini_service.py # Gemini AI calls, complete assistant functionality
 │ │ ├── email_service.py # Gmail API – sends support emails to users
 │ │ └── rag_pipeline.py # Custom RAG pipeline for nearby resources
 │ └── utils/
@@ -45,8 +44,7 @@ graph TD
 MobileUser -->|Mic Input (Web Speech API)| VoiceAssistant
 VoiceAssistant -->|Transcript| FrontendChat
 FrontendChat -->|API Call| FlaskBackend
-FlaskBackend -->|Claude Prompt| ClaudeService
-FlaskBackend -->|Gemini| GeminiService
+FlaskBackend -->|Gemini Prompt| GeminiService
 FlaskBackend -->|Resource Info| RAGPipeline
 FlaskBackend -->|Gmail API| EmailService
 FlaskBackend -->|Sends Back| MobileUI
@@ -69,8 +67,10 @@ PostgreSQL: Resource locations, availability (e.g., # beds/meals)
 In-Memory (Redis optional): AI chat memory, temp context for speech input
 
 🤖 AI Orchestration
-Claude 4
-Personalized assistant for:
+Gemini
+Primary AI assistant for:
+
+Personalized assistant interactions
 
 Warm info delivery
 
@@ -78,7 +78,6 @@ Motivational interviewing-style coaching
 
 Email-ready summaries of resources
 
-Gemini
 Summarizes journal entries
 
 Scores tone (distress, motivation, positivity)
@@ -123,7 +122,7 @@ Optionally reads the reply aloud (Text-to-Speech if needed)
 Example use case:
 
 “Where can I find food tonight?”
-→ Claude replies with open food banks nearby
+→ Gemini replies with open food banks nearby
 
 📥 Email Support System
 Gmail API sends:
@@ -137,7 +136,7 @@ Uplifting quote or message
 📝 Journal + Coaching System
 Daily journaling prompt
 
-Claude responds with tailored support
+Gemini responds with tailored support
 
 Gemini analyzes sentiment
 
