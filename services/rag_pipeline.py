@@ -944,8 +944,9 @@ class RAGPipeline:
             score = 0
 
             # Distance score (closer is better)
-            distance = resource.get("distance", 5.0)
-            score += max(0, 5 - distance)
+            distance = resource.get("distance")
+            if distance is not None:
+                score += max(0, 5 - distance)
 
             # Availability score
             if "beds_available" in resource:
