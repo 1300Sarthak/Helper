@@ -1301,10 +1301,12 @@
                 clearInterval(conversationRefreshInterval);
             }
             
-            conversationRefreshInterval = setInterval(() => {
-                // Simulate new conversation updates
+            conversationRefreshInterval = setInterval(async () => {
+                // Refresh conversation data from API
+                await fetchConversations();
                 renderConversationsTable();
                 renderConversationStats();
+                renderFlaggedConversations();
             }, 10000); // 10 seconds
         }
 
@@ -1694,6 +1696,338 @@
                 renderFlaggedConversations();
             }, 10000); // 10 seconds
         }
+
+        // Real User Data Integration
+        let realUsers = [];
+        let filteredRealUsers = [];
+
+        // API Integration Functions for Users
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/admin/api/users');
+                const data = await response.json();
+                if (data.users) {
+                    realUsers = data.users;
+                    filteredRealUsers = [...realUsers];
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                return false;
+            }
+        }
+
+        async function fetchUserDetail(userId) {
+            try {
+                const response = await fetch(`/admin/api/user/${userId}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching user detail:', error);
+                return null;
+            }
+        }
+
+        async function fetchUserNeeds() {
+            try {
+                const response = await fetch('/admin/api/user-needs');
+                const data = await response.json();
+                return data.needs || [];
+            } catch (error) {
+                console.error('Error fetching user needs:', error);
+                return [];
+            }
+        }
+
+        // Override existing user management functions to use real data
+        async function initializeUserManagement() {
+            const success = await fetchUsers();
+            if (success) {
+                renderRealUsersTable();
+                renderRealUserNeedsChart();
+                renderRealActivityTimeline();
+            } else {
+                // Show error message
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No users found or error loading data</td></tr>';
+            }
+        }
+
+        function renderRealUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredRealUsers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">No users found</td></tr>';
+                return;
+            }
+
+            filteredRealUsers.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 cursor-pointer';
+                row.onclick = () => openRealUserModal(user);
+                
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.location}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            ${getSituationLabel(user.situation)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">${user.needs}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(user.last_active)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.conversation_count}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button onclick="event.stopPropagation(); deleteRealUser(${user.id})" 
+                                class="text-red-600 hover:text-red-900 ml-2">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function renderRealUserNeedsChart() {
+            const needsData = await fetchUserNeeds();
+            
+            const ctx = document.getElementById('userNeedsChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.userNeedsChartInstance) {
+                window.userNeedsChartInstance.destroy();
+            }
+            
+            window.userNeedsChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: needsData.map(need => need.name),
+                    datasets: [{
+                        data: needsData.map(need => need.count),
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(139, 92, 246, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderRealActivityTimeline() {
+            const activityList = document.getElementById('activityList');
+            const activities = [];
+            
+            // Get recent messages from real users
+            realUsers.forEach(user => {
+                if (user.recent_messages && Array.isArray(user.recent_messages)) {
+                    user.recent_messages.forEach(msg => {
+                        activities.push({
+                            time: msg.time,
+                            user: user.name === "Anonymous" ? `User ${user.id}` : user.name,
+                            message: msg.message,
+                            timestamp: new Date(`${new Date().toDateString()} ${msg.time}`)
+                        });
+                    });
+                }
+            });
+
+            activities.sort((a, b) => b.timestamp - a.timestamp);
+            
+            activityList.innerHTML = activities.slice(0, 20).map(activity => `
+                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900">
+                            <span class="font-medium">[${activity.time}]</span> 
+                            <span class="font-medium">${activity.user}</span> messaged:
+                        </p>
+                        <p class="text-sm text-gray-600 mt-1">"${activity.message}"</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterRealUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const situationFilter = document.getElementById('situationFilter').value;
+
+            filteredRealUsers = realUsers.filter(user => {
+                const matchesSearch = user.location.toLowerCase().includes(searchTerm) ||
+                                    user.needs.toLowerCase().includes(searchTerm) ||
+                                    user.name.toLowerCase().includes(searchTerm);
+                
+                const matchesSituation = !situationFilter || user.situation === situationFilter;
+                
+                return matchesSearch && matchesSituation;
+            });
+
+            renderRealUsersTable();
+            renderRealUserNeedsChart();
+        }
+
+        function clearRealFilters() {
+            document.getElementById('userSearch').value = '';
+            document.getElementById('situationFilter').value = '';
+            filteredRealUsers = [...realUsers];
+            renderRealUsersTable();
+            renderRealUserNeedsChart();
+        }
+
+        async function openRealUserModal(user) {
+            // Show loading state
+            document.getElementById('modalTitle').textContent = `User Profile - ${user.name} (ID: ${user.id})`;
+            document.getElementById('modalContent').innerHTML = '<div class="text-center py-8"><div class="text-gray-500">Loading user details...</div></div>';
+            document.getElementById('userModal').classList.remove('hidden');
+
+            // Fetch detailed user data
+            const detailedUser = await fetchUserDetail(user.id);
+            
+            if (detailedUser) {
+                document.getElementById('modalContent').innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <p class="text-sm text-gray-900">${detailedUser.name}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Location</label>
+                                <p class="text-sm text-gray-900">${detailedUser.location}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Current Situation</label>
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    ${getSituationLabel(detailedUser.situation)}
+                                </span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Primary Needs</label>
+                                <p class="text-sm text-gray-900">${detailedUser.needs}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Email</label>
+                                <p class="text-sm text-gray-900">${detailedUser.email || 'Not provided'}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Phone</label>
+                                <p class="text-sm text-gray-900">${detailedUser.phone || 'Not provided'}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Service Information</label>
+                            <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-md">${detailedUser.previous_services}</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Recent Messages</label>
+                            <div class="space-y-2">
+                                ${detailedUser.recent_messages && detailedUser.recent_messages.length > 0 ? 
+                                    detailedUser.recent_messages.map(msg => `
+                                        <div class="bg-gray-50 p-3 rounded-md">
+                                            <span class="text-xs text-gray-500">${msg.time}</span>
+                                            <p class="text-sm text-gray-900 mt-1">${msg.message}</p>
+                                        </div>
+                                    `).join('') : 
+                                    '<p class="text-sm text-gray-500 text-center py-4">No recent messages</p>'
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                            <button onclick="deleteRealUser(${detailedUser.id}); closeUserModal();" 
+                                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                Delete User
+                            </button>
+                            <button onclick="closeUserModal()" 
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md text-sm font-medium">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('modalContent').innerHTML = '<div class="text-center py-8"><div class="text-red-500">Error loading user details</div></div>';
+            }
+        }
+
+        async function deleteRealUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                try {
+                    const response = await fetch(`/admin/api/user/${userId}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Remove from real users array
+                        realUsers = realUsers.filter(user => user.id !== userId);
+                        filteredRealUsers = filteredRealUsers.filter(user => user.id !== userId);
+                        
+                        // Re-render table and chart
+                        renderRealUsersTable();
+                        renderRealUserNeedsChart();
+                        
+                        alert('User deleted successfully');
+                    } else {
+                        alert('Error deleting user: ' + result.error);
+                    }
+                } catch (error) {
+                    alert('Error deleting user: ' + error.message);
+                }
+            }
+        }
+
+        function exportRealUsers() {
+            const headers = ['ID', 'Name', 'Location', 'Current Situation', 'Primary Needs', 'Last Active', 'Conversations'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredRealUsers.map(user => [
+                    user.id,
+                    `"${user.name}"`,
+                    `"${user.location}"`,
+                    `"${getSituationLabel(user.situation)}"`,
+                    `"${user.needs}"`,
+                    user.last_active,
+                    user.conversation_count
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users_export_${new Date().toISOString().split('T')[0].replace(/-/g, '')}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Override existing functions to use real data
+        window.initializeUserManagement = initializeUserManagement;
+        window.filterUsers = filterRealUsers;
+        window.clearFilters = clearRealFilters;
+        window.exportUsers = exportRealUsers;
     </script>
 </body>
 </html> 
