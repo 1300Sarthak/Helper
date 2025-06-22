@@ -1035,3 +1035,34 @@ def api_user_needs():
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/conversation/<int:conversation_id>', methods=['DELETE'])
+def api_delete_conversation(conversation_id):
+    """API endpoint to delete a conversation"""
+    try:
+        conversation = Conversation.query.get(conversation_id)
+        if not conversation:
+            return jsonify({'error': 'Conversation not found'}), 404
+        
+        # Store conversation info for response
+        user_id = conversation.user_id
+        message_preview = (conversation.message[:50] + '...') if conversation.message and len(conversation.message) > 50 else conversation.message or 'No message'
+        
+        # Delete the conversation
+        db.session.delete(conversation)
+        db.session.commit()
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Conversation deleted successfully',
+            'deleted_conversation': {
+                'id': conversation_id,
+                'user_id': user_id,
+                'message_preview': message_preview
+            }
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
