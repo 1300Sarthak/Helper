@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template_string, request, jsonify, redirect, url_for
+from flask import Blueprint, render_template_string, render_template, request, jsonify, redirect, url_for
 from models.user import User, db
 from models.conversation import Conversation
 from datetime import datetime, timedelta
@@ -520,7 +520,7 @@ ADMIN_TEMPLATE = """
 def admin_dashboard():
     """Main admin dashboard"""
     try:
-        # Get statistics
+        # Get basic statistics
         stats = {
             'total_users': User.query.count(),
             'total_conversations': Conversation.query.count(),
@@ -530,6 +530,61 @@ def admin_dashboard():
             'oakland_resources': 32,
             'berkeley_resources': 32
         }
+
+        # Get user situation counts for chart data
+        situation_counts = db.session.query(
+            User.situation,
+            db.func.count(User.id).label('count')
+        ).filter(User.situation.isnot(None)).group_by(User.situation).all()
+        
+        # Initialize chart data with defaults
+        stats.update({
+            'housing_count': 0,
+            'drug_count': 0,
+            'healthcare_count': 0,
+            'food_count': 0,
+            'job_count': 0,
+            'other_count': 0
+        })
+        
+        # Map situation counts to chart data
+        for situation, count in situation_counts:
+            if situation == 'housing':
+                stats['housing_count'] = count
+            elif situation == 'drug':
+                stats['drug_count'] = count
+            elif situation == 'healthcare':
+                stats['healthcare_count'] = count
+            elif situation == 'food':
+                stats['food_count'] = count
+            elif situation == 'job':
+                stats['job_count'] = count
+            else:
+                stats['other_count'] += count
+
+        # Get mode usage counts
+        mode_counts = db.session.query(
+            Conversation.context,
+            db.func.count(Conversation.id).label('count')
+        ).filter(Conversation.context.isnot(None)).group_by(Conversation.context).all()
+        
+        coach_conversations = 0
+        assistant_conversations = 0
+        
+        for context, count in mode_counts:
+            try:
+                context_data = json.loads(context) if isinstance(context, str) else context
+                if isinstance(context_data, dict):
+                    mode = context_data.get('mode', 'assistant')
+                    if mode == 'coach':
+                        coach_conversations += count
+                    else:
+                        assistant_conversations += count
+            except:
+                assistant_conversations += count
+        
+        stats['coach_conversations'] = coach_conversations
+        stats['assistant_conversations'] = assistant_conversations
 
         # Get recent activity (last 20 conversations)
         recent_conversations = db.session.query(
@@ -548,60 +603,11 @@ def admin_dashboard():
                 'details': conv.message[:50] + '...' if conv.message and len(conv.message) > 50 else conv.message or 'N/A'
             })
 
-        # Get users with message counts
-        users = db.session.query(
-            User,
-            db.func.count(Conversation.id).label('message_count')
-        ).outerjoin(Conversation).group_by(User.id).order_by(User.created_at.desc()).limit(50).all()
-
-        users_data = []
-        for user, message_count in users:
-            users_data.append({
-                'id': user.id,
-                'name': user.name or 'Anonymous',
-                'location': user.location,
-                'situation': user.situation,
-                'created_at': user.created_at,
-                'last_active': user.updated_at,
-                'message_count': message_count
-            })
-
-        # Get recent conversations with details
-        conversations = db.session.query(
-            Conversation.created_at,
-            User.name.label('user_name'),
-            Conversation.message_type,
-            Conversation.message,
-            Conversation.response,
-            Conversation.context
-        ).join(User).order_by(Conversation.created_at.desc()).limit(100).all()
-
-        conversations_data = []
-        for conv in conversations:
-            mode = 'N/A'
-            if conv.context:
-                try:
-                    context_data = json.loads(conv.context) if isinstance(
-                        conv.context, str) else conv.context
-                    if isinstance(context_data, dict):
-                        mode = context_data.get('mode', 'N/A')
-                except:
-                    pass
-
-            conversations_data.append({
-                'timestamp': conv.created_at,
-                'user_name': conv.user_name or 'Anonymous',
-                'mode': mode,
-                'user_message': conv.message,
-                'ai_response': conv.response[:100] + '...' if conv.response and len(conv.response) > 100 else conv.response,
-                'emotion_score': None  # Not available in current model
-            })
-
-        return render_template_string(ADMIN_TEMPLATE,
-                                      stats=stats,
-                                      recent_activity=recent_activity,
-                                      users=users_data,
-                                      conversations=conversations_data)
+        # Use the new template file instead of inline template
+        return render_template('admin_dashboard.html',
+                             stats=stats,
+                             recent_activity=recent_activity,
+                             current_time=datetime.now().strftime('%H:%M:%S'))
 
     except Exception as e:
         return f"Error loading admin dashboard: {str(e)}", 500
@@ -700,3 +706,191 @@ def api_stats():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/conversations')
+def api_conversations():
+    """API endpoint for real conversation data"""
+    try:
+        # Get conversations with user data
+        conversations_query = db.session.query(
+            Conversation.id,
+            Conversation.user_id,
+            Conversation.message,
+            Conversation.response,
+            Conversation.created_at,
+            Conversation.context,
+            User.name.label('user_name'),
+            User.location,
+            User.situation,
+            User.needs
+        ).join(User).order_by(Conversation.created_at.desc()).limit(100)
+        
+        conversations_data = []
+        flagged_keywords = ['hurt', 'unsafe', 'no home', 'suicidal', 'kill myself', 'end it all', 'want to die', 'hopeless', 'nowhere to go']
+        
+        for conv in conversations_query:
+            # Extract mode from context
+            mode = 'support'  # default
+            if conv.context:
+                try:
+                    context_data = json.loads(conv.context) if isinstance(conv.context, str) else conv.context
+                    if isinstance(context_data, dict):
+                        mode = context_data.get('mode', 'support')
+                        # Also check user_context for mode
+                        user_context = context_data.get('user_context', {})
+                        if 'mode' in user_context:
+                            mode = user_context['mode']
+                except:
+                    pass
+            
+            # Check if conversation should be flagged
+            is_flagged = False
+            if conv.message:
+                message_lower = conv.message.lower()
+                is_flagged = any(keyword in message_lower for keyword in flagged_keywords)
+            
+            # Create user alias
+            user_alias = f"User #{conv.user_id}"
+            
+            # Calculate duration (for now, estimate based on message length)
+            estimated_duration = max(1, len(conv.message.split()) // 10) if conv.message else 1
+            
+            conversations_data.append({
+                'id': conv.id,
+                'userId': conv.user_id,
+                'userAlias': user_alias,
+                'userLocation': conv.location or 'Unknown',
+                'userNeeds': conv.needs or conv.situation or 'General Support',
+                'mode': mode,
+                'startTime': conv.created_at.isoformat() if conv.created_at else None,
+                'lastMessageTime': conv.created_at.isoformat() if conv.created_at else None,
+                'duration': estimated_duration,
+                'messageCount': 1,  # We're showing individual messages, not full conversations
+                'lastMessage': conv.message[:100] + '...' if conv.message and len(conv.message) > 100 else conv.message or '',
+                'isFlagged': is_flagged,
+                'fullMessage': conv.message or '',
+                'response': conv.response or ''
+            })
+        
+        return jsonify({
+            'conversations': conversations_data,
+            'total_count': len(conversations_data)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@admin_bp.route('/api/conversation/<int:conversation_id>')
+def api_conversation_detail(conversation_id):
+    """API endpoint for detailed conversation data"""
+    try:
+        # Get the specific conversation with user data
+        conversation = db.session.query(
+            Conversation.id,
+            Conversation.user_id,
+            Conversation.message,
+            Conversation.response,
+            Conversation.created_at,
+            Conversation.context,
+            User.name.label('user_name'),
+            User.location,
+            User.situation,
+            User.needs
+        ).join(User).filter(Conversation.id == conversation_id).first()
+        
+        if not conversation:
+            return jsonify({'error': 'Conversation not found'}), 404
+        
+        # Get all conversations for this user to build full conversation thread
+        user_conversations = Conversation.query.filter_by(user_id=conversation.user_id)\
+            .order_by(Conversation.created_at.asc()).all()
+        
+        messages = []
+        for i, conv in enumerate(user_conversations):
+            # Add user message
+            messages.append({
+                'time': conv.created_at.strftime('%H:%M') if conv.created_at else '00:00',
+                'sender': 'user',
+                'message': conv.message or ''
+            })
+            
+            # Add assistant response if available
+            if conv.response:
+                response_time = conv.created_at + timedelta(minutes=1) if conv.created_at else datetime.now()
+                messages.append({
+                    'time': response_time.strftime('%H:%M'),
+                    'sender': 'assistant', 
+                    'message': conv.response
+                })
+        
+        # Extract mode from context
+        mode = 'support'
+        if conversation.context:
+            try:
+                context_data = json.loads(conversation.context) if isinstance(conversation.context, str) else conversation.context
+                if isinstance(context_data, dict):
+                    mode = context_data.get('mode', 'support')
+                    user_context = context_data.get('user_context', {})
+                    if 'mode' in user_context:
+                        mode = user_context['mode']
+            except:
+                pass
+        
+        conversation_detail = {
+            'id': conversation.id,
+            'userId': conversation.user_id,
+            'userAlias': f"User #{conversation.user_id}",
+            'userLocation': conversation.location or 'Unknown',
+            'userNeeds': conversation.needs or conversation.situation or 'General Support',
+            'mode': mode,
+            'startTime': user_conversations[0].created_at.isoformat() if user_conversations else None,
+            'lastMessageTime': user_conversations[-1].created_at.isoformat() if user_conversations else None,
+            'duration': len(user_conversations) * 2,  # Rough estimate
+            'messageCount': len(messages),
+            'messages': messages
+        }
+        
+        return jsonify(conversation_detail)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# Add this route to your admin.py or create a new route in your main app.py
+
+@admin_bp.route('/dashboard')
+def admin_dashboard_simple():
+    """Simple admin dashboard view"""
+    try:
+        # Get statistics
+        stats = {
+            'total_users': User.query.count(),
+            'total_conversations': Conversation.query.count(),
+            'today_users': User.query.filter(User.created_at >= datetime.now().date()).count(),
+            'today_conversations': Conversation.query.filter(Conversation.created_at >= datetime.now().date()).count(),
+        }
+        
+        # Get recent activity (last 20 conversations)
+        recent_conversations = db.session.query(
+            Conversation.created_at,
+            User.name.label('user_name'),
+            Conversation.message,
+        ).join(User).order_by(Conversation.created_at.desc()).limit(20).all()
+        
+        recent_activity = []
+        for conv in recent_conversations:
+            recent_activity.append({
+                'timestamp': conv.created_at.strftime('%H:%M:%S') if conv.created_at else 'N/A',
+                'user_name': conv.user_name or 'Anonymous',
+                'action': 'Message',
+                'details': conv.message[:50] + '...' if conv.message and len(conv.message) > 50 else conv.message or 'N/A'
+            })
+        
+        return render_template('admin_dashboard.html',
+                             stats=stats,
+                             recent_activity=recent_activity)
+    
+    except Exception as e:
+        return f"Error loading admin dashboard: {str(e)}", 500
