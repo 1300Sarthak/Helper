@@ -135,6 +135,719 @@ class RAGPipeline:
                         "requirements": "Intake assessment required",
                         "beds_available": 67,
                         "distance": 1.8
+                    },
+                    {
+                        "name": "Covenant House California - Oakland",
+                        "address": "1695 Depot Rd, Oakland, CA",
+                        "phone": "510-829-8224",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 25,
+                        "distance": null
+                    },
+                    {
+                        "name": "Henry Robinson Center",
+                        "address": "1026 Mission Blvd, Oakland, CA",
+                        "phone": "510-266-2724",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 137,
+                        "distance": null
+                    },
+                    {
+                        "name": "The Holland",
+                        "address": "2419 Castro St, Oakland, CA",
+                        "phone": "510-785-9245",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 90,
+                        "distance": null
+                    },
+                    {
+                        "name": "Oakland Elizabeth House",
+                        "address": "3371 Depot Rd, Oakland, CA",
+                        "phone": "510-863-8125",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 26,
+                        "distance": null
+                    },
+                    {
+                        "name": "East Oakland Community Project",
+                        "address": "9941 University Ave, Oakland, CA",
+                        "phone": "510-990-4919",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 18,
+                        "distance": null
+                    },
+                    {
+                        "name": "St. Mary's Center - Closer to Home",
+                        "address": "4835 Broadway, Oakland, CA",
+                        "phone": "510-478-1593",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 8,
+                        "distance": null
+                    },
+                    {
+                        "name": "St. Mary's Center - Presentation House",
+                        "address": "8931 Ashby Ave, Oakland, CA",
+                        "phone": "510-465-5451",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 8,
+                        "distance": null
+                    },
+                    {
+                        "name": "St. Mary's Center - Friendly Manor",
+                        "address": "362 Shattuck Ave, Oakland, CA",
+                        "phone": "510-546-1983",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 8,
+                        "distance": null
+                    },
+                    {
+                        "name": "Salvation Army Oakland Garden Center",
+                        "address": "5801 Depot Rd, Oakland, CA",
+                        "phone": "510-842-5596",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 45,
+                        "distance": null
+                    },
+                    {
+                        "name": "Operation Dignity Veterans Housing",
+                        "address": "1267 Castro St, Oakland, CA",
+                        "phone": "510-516-8732",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 32,
+                        "distance": null
+                    },
+                    {
+                        "name": "BOSS Oakland Emergency Shelter",
+                        "address": "4715 Telegraph Ave, Oakland, CA",
+                        "phone": "510-910-3574",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 28,
+                        "distance": null
+                    },
+                    {
+                        "name": "Matilda Cleveland Transitional Housing",
+                        "address": "216 Mission Blvd, Oakland, CA",
+                        "phone": "510-560-3421",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 35,
+                        "distance": null
+                    },
+                    {
+                        "name": "Building Futures Women's Center",
+                        "address": "7354 International Blvd, Oakland, CA",
+                        "phone": "510-859-4263",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 22,
+                        "distance": null
+                    },
+                    {
+                        "name": "Family Front Door",
+                        "address": "6488 Ashby Ave, Oakland, CA",
+                        "phone": "510-944-2006",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 15,
+                        "distance": null
+                    },
+                    {
+                        "name": "Oakland Winter Relief Center",
+                        "address": "3607 Shattuck Ave, Oakland, CA",
+                        "phone": "510-393-1870",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 50,
+                        "distance": null
+                    },
+                    {
+                        "name": "Centro Legal de la Raza Housing",
+                        "address": "5956 Castro St, Oakland, CA",
+                        "phone": "510-468-8245",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 12,
+                        "distance": null
+                    },
+                    {
+                        "name": "Davis Street Family Resource Center",
+                        "address": "8236 Mission Blvd, Oakland, CA",
+                        "phone": "510-951-2562",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 18,
+                        "distance": null
+                    },
+                    {
+                        "name": "Women's Daytime Drop-in Oakland",
+                        "address": "9821 Thornton Ave, Oakland, CA",
+                        "phone": "510-623-9396",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 20,
+                        "distance": null
+                    },
+                    {
+                        "name": "Crossroads Emergency Housing",
+                        "address": "7411 University Ave, Oakland, CA",
+                        "phone": "510-872-9069",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 125,
+                        "distance": null
+                    },
+                    {
+                        "name": "Alameda Family Services Shelter",
+                        "address": "6136 Telegraph Ave, Oakland, CA",
+                        "phone": "510-554-6176",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 16,
+                        "distance": null
+                    },
+                    {
+                        "name": "Bay Area Rescue Mission Oakland",
+                        "address": "9731 Center St, Oakland, CA",
+                        "phone": "510-751-8445",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 60,
+                        "distance": null
+                    },
+                    {
+                        "name": "Safe Haven Transitional Housing",
+                        "address": "478 International Blvd, Oakland, CA",
+                        "phone": "510-843-4933",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 24,
+                        "distance": null
+                    },
+                    {
+                        "name": "Unity Council Emergency Housing",
+                        "address": "6207 University Ave, Oakland, CA",
+                        "phone": "510-402-7664",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 14,
+                        "distance": null
+                    },
+                    {
+                        "name": "Aurora Housing Program",
+                        "address": "8293 Depot Rd, Oakland, CA",
+                        "phone": "510-908-9834",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 30,
+                        "distance": null
+                    },
+                    {
+                        "name": "Oakland Interfaith Housing",
+                        "address": "170 International Blvd, Oakland, CA",
+                        "phone": "510-696-7083",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 22,
+                        "distance": null
+                    },
+                    {
+                        "name": "Emergency Food & Shelter Oakland",
+                        "address": "2788 Center St, Oakland, CA",
+                        "phone": "510-612-3823",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 40,
+                        "distance": null
+                    },
+                    {
+                        "name": "New Hope Housing Services",
+                        "address": "6799 Telegraph Ave, Oakland, CA",
+                        "phone": "510-959-8409",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 18,
+                        "distance": null
+                    },
+                    {
+                        "name": "Community Housing Partnership",
+                        "address": "485 San Pablo Ave, Oakland, CA",
+                        "phone": "510-633-1274",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 35,
+                        "distance": null
+                    },
+                    {
+                        "name": "Friendship Bench Emergency Shelter",
+                        "address": "2088 San Pablo Ave, Oakland, CA",
+                        "phone": "510-825-5347",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 25,
+                        "distance": null
+                    },
+                    {
+                        "name": "PATH Oakland Emergency Housing",
+                        "address": "2062 San Pablo Ave, Oakland, CA",
+                        "phone": "510-816-7250",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 20,
+                        "distance": null
+                    },
+                    {
+                        "name": "Transitional Age Youth Program",
+                        "address": "4108 International Blvd, Oakland, CA",
+                        "phone": "510-386-5898",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 16,
+                        "distance": null
+                    },
+                    {
+                        "name": "OCCUR Emergency Shelter",
+                        "address": "7090 Ashby Ave, Oakland, CA",
+                        "phone": "510-244-8082",
+                        "hours": null,
+                        "services": [],
+                        "requirements": null,
+                        "beds_available": 28,
+                        "distance": null
+                    }
+                ],
+                "healthcare": [
+                    {
+                        "name": "Louisa Abada",
+                        "address": "1727 Martin Luther King Jr Way, Oakland, CA 94612-1327",
+                        "phone": "510-893-9230",
+                        "services": [
+                            "Mental health assessment",
+                            "Social services coordination"
+                        ],
+                        "requirements": "17 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Zena Abdallah",
+                        "address": "8601 MacArthur Blvd, Oakland, CA 94605-4037",
+                        "phone": "510-844-5369",
+                        "services": [
+                            "Trauma therapy"
+                        ],
+                        "requirements": "4 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Rachel Adams",
+                        "address": "2633 E 27th St, Oakland, CA 94601-1912",
+                        "phone": "510-536-8111",
+                        "services": [
+                            "Substance abuse counseling",
+                            "Trauma therapy"
+                        ],
+                        "requirements": "5 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Neal Adams",
+                        "address": "5751 Adeline St, Oakland, CA 94608-2815",
+                        "phone": "510-467-4250",
+                        "services": [
+                            "Grief counseling"
+                        ],
+                        "requirements": "12 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Bruce Adams",
+                        "address": "1005 Atlantic Ave, Alameda, CA 94501-1148",
+                        "phone": "415-474-7310",
+                        "services": [
+                            "Trauma therapy"
+                        ],
+                        "requirements": "6 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Katherine Adamson",
+                        "address": "15200 Foothill Blvd, San Leandro, CA 94578-1013",
+                        "phone": "510-352-9690",
+                        "services": [
+                            "LGBTQ+ affirming therapy"
+                        ],
+                        "requirements": "14 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Shaina Adelstein",
+                        "address": "5555 Ascot Dr, Oakland, CA 94611-3001",
+                        "phone": "510-879-2110",
+                        "services": [
+                            "ADHD therapy"
+                        ],
+                        "requirements": "2 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Omar Bocobo",
+                        "address": "2579 San Pablo Ave, Oakland, CA 94612",
+                        "phone": "510-844-7896",
+                        "services": [
+                            "Domestic violence counseling",
+                            "Trauma therapy"
+                        ],
+                        "requirements": "22 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Catherine Ho",
+                        "address": "268 Grand Ave, Oakland, CA 94610",
+                        "phone": "510-555-7382",
+                        "services": [
+                            "Bilingual services"
+                        ],
+                        "requirements": "5 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Amina Samake",
+                        "address": "270 Grand Ave, Oakland, CA 94610",
+                        "phone": "510-926-4751",
+                        "services": [
+                            "Child and adolescent therapy",
+                            "Multicultural counseling",
+                            "Mental health assessment"
+                        ],
+                        "requirements": "14 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Emily Pellegrino",
+                        "address": "2501 Harrison St, Oakland, CA 94612",
+                        "phone": "510-892-3456",
+                        "services": [
+                            "Case management",
+                            "Trauma therapy"
+                        ],
+                        "requirements": "11 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Pamela Lozoff",
+                        "address": "2501 Harrison St, Oakland, CA 94612",
+                        "phone": "510-789-2341",
+                        "services": [
+                            "Art therapy",
+                            "Mental health assessment"
+                        ],
+                        "requirements": "6 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Elizabeth Cary",
+                        "address": "298 Grand Ave Ste 100, Oakland, CA 94610",
+                        "phone": "510-567-8901",
+                        "services": [
+                            "CBT (Cognitive Behavioral Therapy)",
+                            "LGBTQ+ affirming therapy",
+                            "Group therapy"
+                        ],
+                        "requirements": "16 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Tara Montgomery",
+                        "address": "1011 Union St, Oakland, CA 94607",
+                        "phone": "510-234-5678",
+                        "services": [
+                            "CBT (Cognitive Behavioral Therapy)",
+                            "Family therapy",
+                            "Play therapy"
+                        ],
+                        "requirements": "22 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Marisol Enos",
+                        "address": "1011 Union St, Oakland, CA 94607",
+                        "phone": "510-876-5432",
+                        "services": [
+                            "EMDR therapy",
+                            "Art therapy",
+                            "Trauma therapy"
+                        ],
+                        "requirements": "18 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Stacy Daniels",
+                        "address": "1011 Union St, Oakland, CA 94607",
+                        "phone": "510-345-6789",
+                        "services": [
+                            "ADHD therapy",
+                            "Crisis intervention",
+                            "Individual therapy"
+                        ],
+                        "requirements": "19 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Yolanda Olloway-Smith",
+                        "address": "1011 Union St, Oakland, CA 94607",
+                        "phone": "510-987-6543",
+                        "services": [
+                            "Couples therapy",
+                            "ADHD therapy"
+                        ],
+                        "requirements": "5 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Astraea Bella",
+                        "address": "3600 Broadway, Oakland, CA 94611",
+                        "phone": "510-555-0142",
+                        "services": [
+                            "Individual therapy"
+                        ],
+                        "requirements": "4 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Brie Robertori",
+                        "address": "1926 E 19th St, Oakland, CA 94606",
+                        "phone": "510-555-0143",
+                        "services": [
+                            "Substance abuse counseling"
+                        ],
+                        "requirements": "13 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Cameron Murphey",
+                        "address": "5750 College Ave, Oakland, CA 94618",
+                        "phone": "510-555-0144",
+                        "services": [
+                            "Group therapy"
+                        ],
+                        "requirements": "8 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Jennifer Martinez",
+                        "address": "4314 Piedmont Ave, Oakland, CA 94611",
+                        "phone": "510-652-8901",
+                        "services": [
+                            "Group therapy",
+                            "DBT (Dialectical Behavior Therapy)"
+                        ],
+                        "requirements": "15 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Robert Kim",
+                        "address": "2579 San Pablo Ave, Oakland, CA 94612",
+                        "phone": "510-789-2345",
+                        "services": [
+                            "Domestic violence counseling",
+                            "EMDR therapy"
+                        ],
+                        "requirements": "4 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Maria Rodriguez",
+                        "address": "1515 Fruitvale Ave, Oakland, CA 94601",
+                        "phone": "510-345-6789",
+                        "services": [
+                            "EMDR therapy",
+                            "Behavioral therapy"
+                        ],
+                        "requirements": "16 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "David Thompson",
+                        "address": "3001 International Blvd, Oakland, CA 94601",
+                        "phone": "510-567-8901",
+                        "services": [
+                            "Multicultural counseling"
+                        ],
+                        "requirements": "8 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Lisa Chen",
+                        "address": "747 52nd Street, Oakland, CA 94609",
+                        "phone": "510-234-5678",
+                        "services": [
+                            "EMDR therapy"
+                        ],
+                        "requirements": "19 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "James Wilson",
+                        "address": "1266 14th St, Oakland, CA 94607",
+                        "phone": "510-345-6789",
+                        "services": [
+                            "Crisis intervention"
+                        ],
+                        "requirements": "9 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Amy Johnson",
+                        "address": "8521 A St, Oakland, CA 94621",
+                        "phone": "510-456-7890",
+                        "services": [
+                            "Domestic violence counseling"
+                        ],
+                        "requirements": "16 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Carlos Morales",
+                        "address": "3750 Brown Ave, Oakland, CA 94619",
+                        "phone": "510-567-8901",
+                        "services": [
+                            "Group therapy",
+                            "Mental health assessment",
+                            "Art therapy"
+                        ],
+                        "requirements": "19 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Diana Lee",
+                        "address": "2607 Myrtle St, Oakland, CA 94607",
+                        "phone": "510-678-9012",
+                        "services": [
+                            "Social services coordination",
+                            "Domestic violence counseling"
+                        ],
+                        "requirements": "2 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Kevin Brown",
+                        "address": "8755 Fontaine St, Oakland, CA 94605",
+                        "phone": "510-789-0123",
+                        "services": [
+                            "EMDR therapy",
+                            "Multicultural counseling"
+                        ],
+                        "requirements": "25 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Angela Davis",
+                        "address": "1023 MacArthur Blvd, Oakland, CA 94610",
+                        "phone": "510-890-1234",
+                        "services": [
+                            "Depression and anxiety"
+                        ],
+                        "requirements": "17 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Michelle Garcia",
+                        "address": "12250 Skyline Blvd, Oakland, CA 94619",
+                        "phone": "510-901-2345",
+                        "services": [
+                            "Domestic violence counseling",
+                            "Individual therapy"
+                        ],
+                        "requirements": "7 years experience",
+                        "distance": null
+                    }
+                ]
+            },
+            "berkeley": {
+                "healthcare": [
+                    {
+                        "name": "Patrick Conlin",
+                        "address": "2901 Hillegass Ave # 2, Berkeley, CA 94705-2211",
+                        "phone": "510-841-7321",
+                        "services": [
+                            "LGBTQ+ affirming therapy",
+                            "Crisis intervention"
+                        ],
+                        "requirements": "16 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Katrina Rose Serrano",
+                        "address": "2105 Martin Luther King Jr Way, Berkeley, CA 94704-1108",
+                        "phone": "510-926-6677",
+                        "services": [
+                            "Family therapy"
+                        ],
+                        "requirements": "11 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Judith Ann Izzo",
+                        "address": "2640 Martin Luther King Jr Way, Berkeley, CA 94704-3238",
+                        "phone": "510-981-5290",
+                        "services": [
+                            "Child and adolescent therapy",
+                            "Individual therapy",
+                            "DBT (Dialectical Behavior Therapy)"
+                        ],
+                        "requirements": "19 years experience",
+                        "distance": null
+                    },
+                    {
+                        "name": "Julianna Dickey",
+                        "address": "2107 Spaulding Ave, Berkeley, CA 94703-1420",
+                        "phone": "510-845-5197",
+                        "services": [
+                            "Trauma therapy"
+                        ],
+                        "requirements": "4 years experience",
+                        "distance": null
                     }
                 ]
             }
